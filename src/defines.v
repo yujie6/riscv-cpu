@@ -8,6 +8,10 @@
 `define AluSelBus 2:0
 `define ChipEnable 1'b1 
 `define ChipDisable 1'b0
+`define WriteEnable 1'b1 
+`define WriteDisable 1'b0
+`define ReadEnable 1'b1 
+`define ReadDisable 1'b0
 
 // ------------- macros related to instructions ---------------
 `define EXE_ORI 6'b001101
@@ -32,4 +36,5 @@
 `define RegBus 31:0 // number of registers in Regfile
 `define RegWidth 32 
 `define RegNum 32
-`define NOPRegAddr 5'b00000  
+`define NOPRegAddr 5'b00000
+`define RegNumLog2 32  

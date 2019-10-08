@@ -5,16 +5,19 @@ rpath=$prefix/bin/
 # clearing test dir
 rm -rf ./test
 mkdir ./test
+tool1=riscv32-unknown-elf-
+tool2=riscv32-unknown-linux-gnu-
+tool=${tool1}
 # compiling rom
-${rpath}riscv32-unknown-elf-as -o ./sys/rom.o -march=rv32i ./sys/rom.s
+${rpath}${tool}as -o ./sys/rom.o -march=rv32i ./sys/rom.s
 # compiling testcase
 cp ./testcase/${1%.*}.c ./test/test.c
-${rpath}riscv32-unknown-elf-gcc -o ./test/test.o -I ./sys -c ./test/test.c -O2 -march=rv32i -mabi=ilp32 -Wall
+${rpath}${tool}gcc -o ./test/test.o -I ./sys -c ./test/test.c -O2 -march=rv32i -mabi=ilp32 -Wall
 # linking
-${rpath}riscv32-unknown-elf-ld -T ./sys/memory.ld ./sys/rom.o ./test/test.o -L $prefix/riscv32-unknown-elf/lib/ -L $prefix/lib/gcc/riscv32-unknown-elf/8.2.0/ -lc -lgcc -lm -lnosys -o ./test/test.om
+${rpath}${tool}ld -T ./sys/memory.ld ./sys/rom.o ./test/test.o -L $prefix/riscv32-unknown-elf/lib/ -L $prefix/lib/gcc/riscv32-unknown-elf/9.2.0/ -lc -lm -lgcc -lnosys -o ./test/test.om
 # converting to verilog format
-${rpath}riscv32-unknown-elf-objcopy -O verilog ./test/test.om ./test/test.data
+${rpath}${tool}objcopy -O verilog ./test/test.om ./test/test.data
 # converting to binary format(for ram uploading)
-${rpath}riscv32-unknown-elf-objcopy -O binary ./test/test.om ./test/test.bin
+${rpath}${tool}objcopy -O binary ./test/test.om ./test/test.bin
 # decompile (for debugging)
-${rpath}riscv32-unknown-elf-objdump -D ./test/test.om > ./test/test.dump
+${rpath}${tool}objdump -D ./test/test.om > ./test/test.dump
