@@ -1,0 +1,15 @@
+#!/bin/bash
+if [[ $1 == 'all' ]]
+then
+		for i in $(ls ./testcase/*.c)
+		do
+			a=${i//'.c'/}
+			b=${a//'./testcase/'/}
+			./build_test $b
+		done
+fi
+
+if [[ $1 == "clean" ]]
+then
+	rm -rf test
+fi

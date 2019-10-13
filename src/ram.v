@@ -9,7 +9,7 @@ module ram #(parameter ADDR_WIDTH = 17)
              output wire [7:0] d_out);        // data output
     
     wire       ram_bram_we;
-    wire [7:0] ram_bram_dout;
+    wire [7:0] ram_bram_dout;  // ???
     
     single_port_ram_sync #(.ADDR_WIDTH(ADDR_WIDTH),
     .DATA_WIDTH(8)) ram_bram(

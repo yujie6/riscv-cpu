@@ -2,16 +2,16 @@
 // port modification allowed for debugging purposes
 
 module cpu(input wire clk_in,
-           input wire rst_in,
-           input wire					 rdy_in,
-           input wire [7:0] mem_din,
-           output wire [7:0] mem_dout,
-           output wire [31:0] mem_a,
-           output wire mem_wr,
-           output wire [31:0]			dbgreg_dout);
-    
+    input wire rst_in,
+    input wire rdy_in,
+    input wire [7:0] mem_din,
+    output wire [7:0] mem_dout,
+    output wire [31:0] mem_addr,
+    output wire mem_wr,
+    output wire [31:0] dbgreg_dout);
+
     // implementation goes here
-    
+
     // Specifications:
     // - Pause cpu(freeze pc, registers, etc.) when rdy_in is low
     // - Memory read takes 2 cycles(wait till next cycle), write takes 1 cycle(no need to wait)
@@ -21,21 +21,21 @@ module cpu(input wire clk_in,
     // - 0x30000 write: write a byte to output (write 0x00 is ignored)
     // - 0x30004 read: read clocks passed since cpu starts (in dword, 4 bytes)
     // - 0x30004 write: indicates program stop (will output '\0' through uart tx)
-    
+
     always @(posedge clk_in)
-    begin
-        if (rst_in)
         begin
-            
+            if (rst_in)
+                begin
+
+                end
+            else if (!rdy_in)
+                begin
+
+                end
+            else
+                begin
+
+                end
         end
-        else if (!rdy_in)
-        begin
-            
-        end
-        else
-        begin
-            
-        end
-    end
-    
+
 endmodule
