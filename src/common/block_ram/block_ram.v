@@ -81,7 +81,7 @@ module single_port_ram_sync#(parameter ADDR_WIDTH=6, parameter DATA_WIDTH=8)(
         for (i = 0; i < 2 ** ADDR_WIDTH;i = i+1) begin
             ram[i] = 0;
         end
-        $readmemh("$HOME/Music/CSAPP/Arch2019/RiscV-CPU/test/data/array_test1", ram);
+        $readmemh("test.mem", ram);
         // add test.data to vivado project or specify a valid file path
     end
 

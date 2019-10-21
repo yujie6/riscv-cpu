@@ -1,13 +1,9 @@
 // riscv top module file
 // modification allowed for debugging purposes
-`include "./ram.v"
-`include "./hci.v"
-`include "./cpu.v"
-`include "./defines.v"
 
-module riscv_top#(parameter SIM=0) // TODO what is this ??
-    (input wire EXCLK,
-        input wire btnC,
+module riscv_top#(parameter SIM=0)
+    (input wire EXCLK, // clk
+        input wire btnC, // rst
         output wire Tx,
         input wire Rx,
         output wire led);
@@ -17,7 +13,7 @@ module riscv_top#(parameter SIM=0) // TODO what is this ??
     localparam RAM_ADDR_WIDTH=17;            // 128KiB ram, should not be modified
 
     reg rst;
-    reg rst_delay;
+    reg rst_delay; // TODO delay??
 
     wire clk;
 
@@ -49,16 +45,16 @@ module riscv_top#(parameter SIM=0) // TODO what is this ??
     // RAM: internal ram
     //
     wire ram_en;
-    wire [RAM_ADDR_WIDTH-1:0] ram_a;
+    wire [RAM_ADDR_WIDTH-1:0] ram_a; // ram_address
     wire [7:0] ram_dout;
 
     ram#(.ADDR_WIDTH(RAM_ADDR_WIDTH))ram0(
         .clk_in(clk),
-        .en_in(ram_en),
-        .r_nw_in(~cpumc_wr),
+        .en_in(ram_en), // chip enable ? as the ram size is only (2^17 = 128kb)
+        .r_nw_in(~cpumc_wr), // 1 to read | 0 to write
         .a_in(ram_a),
-        .d_in(cpumc_din),
-        .d_out(ram_dout)
+        .d_in(cpumc_din), // data to write
+        .d_out(ram_dout) // data read from mem
     );
 
     assign ram_en = (cpumc_a[RAM_ADDR_WIDTH:RAM_ADDR_WIDTH-1] == 2'b11) ? 1'b0:1'b1;

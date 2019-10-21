@@ -7,13 +7,14 @@ module testbench;
 reg clk;
 reg rst;
 
-riscv_top #(.SIM(1)) top(
+riscv_top #(.SIM(1)) top( // set parameter sim = 1
     .EXCLK(clk),
     .btnC(rst),
     .Tx(),
     .Rx(),
     .led()
 );
+
 
 initial begin
   clk=0;

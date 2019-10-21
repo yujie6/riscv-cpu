@@ -1,0 +1,2 @@
+#!/bin/bash
+iverilog -o FTL ../sim/testbench.v ../sim/led.v hci.v ram.v riscv_top.v regfile.v common/block_ram/block_ram.v cpu.v common/uart/uart_baud_clk.v common/uart/uart_rx.v common/uart/uart_tx.v common/uart/uart.v common/fifo/fifo.v
