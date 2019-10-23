@@ -1,6 +1,6 @@
 // RISCV32I CPU top module
 // port modification allowed for debugging purposes
-
+`include "defines.v"
 module cpu(input wire clk_in,
     input wire rst_in,
     input wire rdy_in,
@@ -22,15 +22,23 @@ module cpu(input wire clk_in,
     // - 0x30004 read: read clocks passed since cpu starts (in dword, 4 bytes)
     // - 0x30004 write: indicates program stop (will output '\0' through uart tx)
 
+    wire [`InstAddrBus] pc;
+    wire [`InstAddrBus] id_pc_i;
+    wire [`InstBus] id_inst_i;
+
+
     always @(posedge clk_in)
         begin
             if (rst_in)
                 begin
-
+                    mem_dout <= 8'b00000000;
+                    mem_wr <= `WriteDisable;
+                    mem_addr <= `ZeroWord;
+                    dbgreg_dout <= `ZeroWord;
                 end
             else if (!rdy_in)
                 begin
-
+                    // Pause
                 end
             else
                 begin
@@ -38,4 +46,12 @@ module cpu(input wire clk_in,
                 end
         end
 
-endmodule
+
+
+    if_id if_id0(
+        .clk(clk_in), .rst(rst_in), .if_pc(pc),
+        .if_inst()
+    );
+
+
+endmodule: cpu
