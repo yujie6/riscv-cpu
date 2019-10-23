@@ -7,11 +7,11 @@ module regfile(
     input wire we,  // write or not
     input wire[`RegAddrBus] waddr,
     input wire[`RegBus] wdata,
-    // read port 1
+    // read port 1 (for rs1)
     input wire re1,  // write or not
     input wire[`RegAddrBus] raddr1,
     output reg[`RegBus] rdata1,
-    // read port 2
+    // read port 2 (for rs2)
     input wire re2,  // write or not
     input wire[`RegAddrBus] raddr2,
     output reg[`RegBus] rdata2
