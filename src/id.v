@@ -14,6 +14,7 @@ module id(input wire rst,
           output reg [`RegBus] reg1_o,
           output reg [`RegBus] reg2_o,
           output reg [`RegBus] imm_o,           // send imm to id_ex
+          output reg [`RegAddrBus] shamt_o,
           output reg [`RegAddrBus] rd_o,
           output reg wreg_o);
     wire [2:0] funct3      = inst_i[14:12];
@@ -56,6 +57,7 @@ module id(input wire rst,
             reg1_addr_o <= `NOPRegAddr;
             reg2_addr_o <= `NOPRegAddr;
             imm_o       <= 32'h0;
+            shamt_o     <= 5'b00000;
             end else begin
             aluop_o     <= `EXE_NOP_OP;
             alusel_o    <= `EXE_RES_NOP;
@@ -67,6 +69,7 @@ module id(input wire rst,
             reg1_o      <= `ZeroWord;
             reg2_o      <= `ZeroWord;
             imm_o       <= `ZeroWord;
+            shamt_o     <= 5'b00000;
             // should not declare here, as the instructions here are
             // parallel ??
             reg1_addr_o <= rs1;
@@ -74,27 +77,31 @@ module id(input wire rst,
             case (opcode)
                 `EXE_LUI: begin
                     // Load immediate to rd
-                    wreg_o <= `WriteEnable;
-                    imm_o  <= imm_u;
-                    rd_o   <= rd;
+                    aluop_o <= `EXE_LUI_OP;
+                    wreg_o  <= `WriteEnable;
+                    imm_o   <= imm_u;
+                    rd_o    <= rd;
                 end
                 
                 `EXE_AUIPC: begin
                     // change pc to pc + imm
-                    wreg_o <= `WriteEnable;
-                    imm_o  <= imm_u;
-                    rd_o   <= rd;
+                    aluop_o <= `EXE_AUIPC_OP;
+                    wreg_o  <= `WriteEnable;
+                    imm_o   <= imm_u;
+                    rd_o    <= rd;
                 end
                 
                 `EXE_JAL: begin
                     // jump to imm_j and write pc+4 to rd
-                    wreg_o <= `WriteEnable;
-                    imm_o  <= imm_j;
-                    rd_o   <= rd;
+                    aluop_o <= `EXE_JAL_OP;
+                    wreg_o  <= `WriteEnable;
+                    imm_o   <= imm_j;
+                    rd_o    <= rd;
                 end
                 
                 `EXE_JALR: begin
                     // jump to reg[rs1] + imm_i
+                    aluop_o     <= `EXE_JALR_OP;
                     wreg_o      <= `WriteEnable;
                     imm_o       <= imm_i;
                     rd_o        <= rd;
@@ -111,22 +118,22 @@ module id(input wire rst,
                     reg2_o      <= reg2_data_i;
                     case (funct3)
                         `EXE_BEQ: begin
-                            
+                            aluop_o <= `EXE_BEQ_OP;
                         end
                         `EXE_BNE: begin
-                            
+                            aluop_o <= `EXE_BNE_OP;
                         end
                         `EXE_BLT: begin
-                            
+                            aluop_o <= `EXE_BLT_OP;
                         end
                         `EXE_BGE: begin
-                            
+                            aluop_o <= `EXE_BGE_OP;
                         end
                         `EXE_BLTU: begin
-                            
+                            aluop_o <= `EXE_BLTU_OP;
                         end
                         `EXE_BGEU: begin
-                            
+                            aluop_o <= `EXE_BGEU_OP;
                         end
                         default: begin
                         end
@@ -141,19 +148,19 @@ module id(input wire rst,
                     imm_o       <= imm_i;
                     case (funct3)
                         `EXE_LB: begin
-                            
+                            aluop_o <= `EXE_LB_OP;
                         end
                         `EXE_LH: begin
-                            
+                            aluop_o <= `EXE_LH_OP;
                         end
                         `EXE_LW: begin
-                            
+                            aluop_o <= `EXE_LW_OP;
                         end
                         `EXE_LBU: begin
-                            
+                            aluop_o <= `EXE_LBU_OP;
                         end
                         `EXE_LHU: begin
-                            
+                            aluop_o <= `EXE_LHU_OP;
                         end
                         default: begin
                             
@@ -168,33 +175,50 @@ module id(input wire rst,
                     reg1_o      <= reg1_data_i;
                     imm_o       <= imm_i;
                     case (funct3)
+                        // FIXME: where is SLTU
                         `EXE_ADDI: begin
                             // 12-bit imm sign extended, then reg[rd] <= imm + reg[rs1]
+                            aluop_o  <= `EXE_ADDI_OP;
+                            alusel_o <= `EXE_RES_ARITH;
                         end
                         `EXE_SLTI: begin
                             // imm sign extended & rs1 as signed 32-bit
                             // reg[rd] <= (imm > reg[rs1])
+                            aluop_o <= `EXE_SLTI_OP;
                         end
                         `EXE_SLTIU: begin
                             // imm sign extended & rs1 as unsigned 32-bit
+                            aluop_o <= `EXE_SLTIU_OP;
                         end
                         `EXE_XORI: begin
                             // almost the same as ADDI
+                            aluop_o  <= `EXE_XORI_OP;
+                            alusel_o <= `EXE_RES_LOGIC;
                         end
                         `EXE_ORI: begin
                             // almost the same as ADDI
+                            aluop_o  <= `EXE_ORI_OP;
+                            alusel_o <= `EXE_RES_LOGIC;
                         end
                         `EXE_ANDI: begin
                             // almost the same as ADDI
+                            aluop_o <= `EXE_ANDI_OP;
+                            alusel_o <= `EXE_RES_LOGIC;
                         end
                         `EXE_SLLI: begin
                             // reg[rd] <= (reg[rs1] << shamt) also called shit amount
+                            aluop_o <= `EXE_SLLI_OP;
+                            shamt_o <= rs2;
                         end
                         `EXE_SRLI: begin
                             // reg[rd] < = (reg[rs1] >> shamt) indeed shamt = rs2
+                            aluop_o <= `EXE_SRLI_OP;
+                            shamt_o <= rs2;
                         end
                         `EXE_SRAI: begin
                             // reg[rd] <= (reg[rs1] >> shamt) (arithmetic shift, sign-bit->hign bit)
+                            aluop_o <= `EXE_SRAI_OP;
+                            shamt_o <= rs2;
                         end
                         default: begin
                         end
@@ -212,10 +236,12 @@ module id(input wire rst,
                         `EXE_ADD_SUB: begin
                             case (funct7)
                                 `EXE_ADD: begin
-                                    
+                                    aluop_o  <= `EXE_ADD_OP;
+                                    alusel_o <= `EXE_RES_LOGIC;
                                 end
                                 `EXE_SUB: begin
-                                    
+                                    aluop_o  <= `EXE_SUB_OP;
+                                    alusel_o <= `EXE_RES_LOGIC;
                                 end
                                 default: begin
                                     
@@ -223,24 +249,26 @@ module id(input wire rst,
                             endcase
                         end
                         `EXE_SLL: begin
-                            
+                            aluop_o <= `EXE_SLL_OP;
+                            alusel_o <= `EXE_RES_SHIFT;
                         end
                         `EXE_SLT: begin
-                            
+                            aluop_o <= `EXE_SLT_OP;
                         end
                         `EXE_SLTU: begin
-                            
+                            aluop_o <= `EXE_SLTU_OP;
                         end
                         `EXE_XOR: begin
-                            
+                            aluop_o  <= `EXE_XOR_OP;
+                            alusel_o <= `EXE_RES_LOGIC;
                         end
                         `EXE_SRL_SRA: begin
                             case (funct7)
                                 `EXE_SRL: begin
-                                    
+                                    aluop_o <= `EXE_SRL_OP;
                                 end
                                 `EXE_SRA: begin
-                                    
+                                    aluop_o <= `EXE_SRA_OP;
                                 end
                                 default: begin
                                     
@@ -248,10 +276,12 @@ module id(input wire rst,
                             endcase
                         end
                         `EXE_OR: begin
-                            
+                            aluop_o  <= `EXE_OR_OP;
+                            alusel_o <= `EXE_RES_LOGIC;
                         end
                         `EXE_AND: begin
-                            
+                            aluop_o  <= `EXE_AND_OP;
+                            alusel_o <= `EXE_RES_LOGIC;
                         end
                         default: begin
                             
@@ -259,18 +289,6 @@ module id(input wire rst,
                     endcase
                 end
                 
-                
-                
-                `EXE_ORI: begin
-                    wreg_o      <= `WriteEnable;
-                    aluop_o     <= `EXE_OR_OP;
-                    alusel_o    <= `EXE_RES_LOGIC; // The operation is logic
-                    reg2_read_o <= `ReadDisable;
-                    reg1_read_o <= `ReadEnable;
-                    // imm <= 
-                    rd_o      <= rd;
-                    instvalid <= `InstValid;
-                end
                 default: begin
                 end
             endcase

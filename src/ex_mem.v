@@ -23,4 +23,4 @@ module ex_mem(
         end
     end
 
-endmodule : ex_mem
+endmodule

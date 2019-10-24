@@ -31,6 +31,7 @@ module cpu(input wire clk_in,
     wire [`RegBus] id_reg1_o;
     wire [`RegBus] id_reg2_o;
     wire [`RegBus] id_imm_o;
+    wire [`RegAddrBus] id_shamt_o;
     wire id_wreg_o;
     wire [`RegAddrBus] id_wd_o;
     
@@ -38,6 +39,7 @@ module cpu(input wire clk_in,
     wire [`AluSelBus] ex_alusel_i;
     wire [`RegBus] ex_reg1_i;
     wire [`RegBus] ex_reg2_i;
+    wire [`RegAddrBus] ex_shamt_i;
     wire [`RegBus] ex_imm_i;
     wire ex_wreg_i;
     wire [`RegAddrBus] ex_wd_i;
@@ -85,7 +87,8 @@ module cpu(input wire clk_in,
     end
     
     pc_reg pc_reg0(
-    .clk(clk_in), .rst(rst_in), .pc(pc), .ce(rst_in)
+    .clk(clk_in), .rst(rst_in),
+    .pc(pc), .ce(rst_in)
     );
     
     assign mem_addr = pc;
@@ -107,7 +110,8 @@ module cpu(input wire clk_in,
     // data send to ed_ex
     .aluop_o(id_aluop_o), .alusel_o(id_alusel_o),
     .reg1_o(id_reg1_o), .reg2_o(id_reg2_o),
-    .rd_o(id_wd_o), .wreg_o(id_wreg_o), .imm_o(id_imm_o)
+    .rd_o(id_wd_o), .wreg_o(id_wreg_o),
+    .imm_o(id_imm_o), .shamt_o(id_shamt_o)
     );
     
     regfile regfile0(
@@ -125,12 +129,12 @@ module cpu(input wire clk_in,
     .id_reg1(id_reg1_o), .id_reg2(id_reg2_o),
     .id_wd(id_wd_o), .id_wreg(id_wreg_o),
     .id_alusel(id_alusel_o), .id_aluop(id_aluop_o),
-    .id_imm(id_imm_o),
+    .id_imm(id_imm_o), .id_shamt(id_shamt_o),
     // data send to ex
     .ex_reg1(ex_reg1_i), .ex_reg2(ex_reg2_i),
     .ex_wd(ex_wd_i), .ex_wreg(ex_wreg_i),
     .ex_aluop(ex_aluop_i), .ex_alusel(ex_alusel_i),
-    .ex_imm(ex_imm_i)
+    .ex_imm(ex_imm_i), .ex_shamt(ex_shamt_i)
     );
     
     ex ex0(
@@ -139,6 +143,7 @@ module cpu(input wire clk_in,
     .reg2_i(ex_reg2_i), .rd_i(ex_wd_i),
     .aluop_i(ex_aluop_i), .alusel_i(ex_alusel_i),
     .wreg_i(ex_wreg_i), .imm_i(ex_imm_i),
+    .shamt_i(ex_shamt_i),
     // output to ex_mem
     .rd_o(ex_wd_o), .wdata_o(ex_wdata_o),
     .wreg_o(ex_wreg_o)
@@ -174,4 +179,4 @@ module cpu(input wire clk_in,
     );
     
     
-    endmodule: cpu
+endmodule

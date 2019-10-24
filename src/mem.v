@@ -22,4 +22,4 @@ module mem(
         end
     end
 
-endmodule: mem
+endmodule

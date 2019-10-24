@@ -10,7 +10,7 @@ module mem_wb(
 
     output reg [`RegAddrBus] wb_rd,
     output reg [`RegBus] wb_wdata,
-    output wire wb_wreg
+    output reg wb_wreg
 );
     always @(posedge clk) begin
         if (rst == `RstEnable) begin
@@ -26,4 +26,4 @@ module mem_wb(
     end
 
 
-endmodule: mem_wb
+endmodule
