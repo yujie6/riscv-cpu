@@ -1,4 +1,4 @@
-`include "./defines.v"
+`include "defines.v"
 
 module ex(
     input wire rst,
@@ -6,6 +6,7 @@ module ex(
     input wire [`AluSelBus] alusel_i,
     input wire [`RegBus] reg1_i,
     input wire [`RegBus] reg2_i,
+    input wire [`RegBus] imm_i,
     input wire [`RegAddrBus] rd_i,
     input wire wreg_i,
 
