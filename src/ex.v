@@ -11,7 +11,11 @@ module ex(input wire rst,
           input wire wreg_i,
           output reg [`RegAddrBus] rd_o,
           output reg wreg_o,
-          output reg [`RegBus] wdata_o);
+          output reg [`RegBus] wdata_o,
+          output reg [`MemAddrBus] mem_addr_o,
+          output wire [`AluOpBus] aluop_o);
+    
+    assign aluop_o = aluop_i;
     
     reg [`RegBus] logic_out;
     reg [`RegBus] shift_out;
@@ -20,16 +24,16 @@ module ex(input wire rst,
     
     // All logic operation are done in this submodule
     always @(*) begin
-        if (rst == `RstEnable) begin
+        if (rst == `RstEnable || alusel_i != `EXE_RES_LOGIC) begin
             logic_out <= `ZeroWord;
             end else begin
             case (aluop_i)
-                `EXE_OR_OP:   logic_out <= reg1_i | reg2_i;
-                `EXE_AND_OP:  logic_out <= reg1_i & reg2_i;
-                `EXE_XOR_OP:  logic_out <= reg1_i ^ reg2_i;
-                `EXE_ORI_OP:  logic_out <= reg1_i | imm_i;
-                `EXE_ANDI_OP: logic_out <= reg1_i & imm_i;
-                `EXE_XORI_OP: logic_out <= reg1_i ^ imm_i;
+                `EXE_OR_OP:   logic_out <= $signed(reg1_i) | $signed(reg2_i);
+                `EXE_AND_OP:  logic_out <= $signed(reg1_i) & $signed(reg2_i);
+                `EXE_XOR_OP:  logic_out <= $signed(reg1_i) ^ $signed(reg2_i);
+                `EXE_ORI_OP:  logic_out <= $signed(reg1_i) | $signed(imm_i);
+                `EXE_ANDI_OP: logic_out <= $signed(reg1_i) & $signed(imm_i);
+                `EXE_XORI_OP: logic_out <= $signed(reg1_i) ^ $signed(imm_i);
                 default : begin
                     logic_out <= `ZeroWord;
                 end
@@ -39,19 +43,20 @@ module ex(input wire rst,
     
     // all shift operations are done here
     always @(*) begin
-        if (rst == `RstEnable) begin
+        if (rst == `RstEnable || alusel_i != `EXE_RES_SHIFT) begin
             shift_out <= `ZeroWord;
             end else begin
             case (aluop_i)
-                `EXE_SLL_OP:   logic_out <= reg1_i | reg2_i;
-                `EXE_SLLI_OP:  logic_out <= reg1_i & reg2_i;
-                `EXE_SRL_OP:   logic_out <= reg1_i ^ reg2_i;
-                `EXE_SRLI_OP:  logic_out <= reg1_i | imm_i;
-                
-                `EXE_SLT_OP:   logic_out <= reg1_i & imm_i;
-                `EXE_SLTI_OP:  logic_out <= reg1_i ^ imm_i;
-                `EXE_SLTU_OP:  logic_out <= reg1_i ^ imm_i;
-                `EXE_SLTIU_OP: logic_out <= reg1_i ^ imm_i;
+                `EXE_SLL_OP:   shift_out <= reg1_i << reg2_i[4:0];
+                `EXE_SLLI_OP:  shift_out <= reg1_i << shamt_i;
+                `EXE_SRL_OP:   shift_out <= reg1_i >> reg2_i[4:0];
+                `EXE_SRLI_OP:  shift_out <= reg1_i >> shamt_i;
+                `EXE_SRAI_OP:  shift_out <= $signed(reg1_i) >>> shamt_i;
+                // TODO: May need to escape shift
+                `EXE_SLT_OP:   shift_out <= $signed(reg1_i) < $signed(reg2_i);
+                `EXE_SLTI_OP:  shift_out <= $signed(reg1_i) < $signed(imm_i);
+                `EXE_SLTU_OP:  shift_out <= reg1_i < reg2_i;
+                `EXE_SLTIU_OP: shift_out <= reg1_i < imm_i;
                 default : begin
                     shift_out <= `ZeroWord;
                 end
@@ -59,21 +64,43 @@ module ex(input wire rst,
         end
     end
     
-    // all arithmetic operations are done here including pc 
+    // all arithmetic operations are done here including pc
     always @(*) begin
-        if (rst == `RstEnable) begin
+        if (rst == `RstEnable || alusel_i != `EXE_RES_ARITH) begin
             arith_out <= `ZeroWord;
             end else begin
             case (aluop_i)
-                `EXE_ADD_OP:   arith_out  <= reg1_i + reg2_i;
-                `EXE_ADDI_OP:  arith_out  <= reg1_i + imm_i;
-                `EXE_SUB_OP:   arith_out  <= reg1_i - reg2_i;
-                `EXE_SUBI_OP:   arith_out <= reg1_i - imm_i;
+                `EXE_ADD_OP:   arith_out  <= $signed(reg1_i) + $signed(reg2_i);
+                `EXE_ADDI_OP:  arith_out  <= $signed(reg1_i) + $signed(imm_i);
+                `EXE_SUB_OP:   arith_out  <= $signed(reg1_i) - $signed(reg2_i);
+                `EXE_SUBI_OP:   arith_out <= $signed(reg1_i) - $signed($signed(imm_i));
                 // JAL and so on ...
                 default : begin
                     arith_out <= `ZeroWord;
                 end
             endcase
+        end
+    end
+
+    always @(*) begin
+        if (rst == `RstEnable || alusel_i != `EXE_RES_JUMP_BRANCH) begin
+            
+        end
+    end
+    
+    always @(*) begin
+        if (rst == `RstEnable || alusel_i != `EXE_RES_LOAD_STORE) begin
+            mem_out <= `ZeroWord;
+        end
+        else begin
+            mem_addr_o <= reg1_i + $signed(imm_i);
+            // case (aluop_i)
+            //     `EXE_BEQ_OP: begin
+                    
+            //     end
+            //     default: begin
+            //     end
+            // endcase
         end
     end
     
@@ -83,11 +110,12 @@ module ex(input wire rst,
         rd_o   <= rd_i;
         wreg_o <= wreg_i;
         case (alusel_i)
-            `EXE_RES_LOGIC: begin
-                wdata_o <= logic_out;
-            end
-            `EXE_RES_ARITH: begin
-                wdata_o <= arith_out;
+            `EXE_RES_LOGIC: wdata_o <= logic_out;
+            `EXE_RES_ARITH: wdata_o <= arith_out;
+            `EXE_RES_SHIFT: wdata_o <= shift_out;
+            `EXE_RES_LOAD_STORE: begin
+                wdata_o    <= 0;
+                mem_addr_o <= mem_out;
             end
             default : begin
                 wdata_o <= `ZeroWord;

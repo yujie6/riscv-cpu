@@ -146,7 +146,7 @@ module cpu(input wire clk_in,
     .shamt_i(ex_shamt_i),
     // output to ex_mem
     .rd_o(ex_wd_o), .wdata_o(ex_wdata_o),
-    .wreg_o(ex_wreg_o)
+    .wreg_o(ex_wreg_o), .mem_addr_o(mem_addr)
     );
     
     ex_mem ex_mem0(

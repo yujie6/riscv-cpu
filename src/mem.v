@@ -6,9 +6,9 @@ module mem(
     input wire [`RegBus] wdata_i,
     input wire wreg_i,
 
-    output wire [`RegAddrBus] rd_o,
-    output wire [`RegBus] wdata_o,
-    output wire wreg_o
+    output reg [`RegAddrBus] rd_o,
+    output reg [`RegBus] wdata_o,
+    output reg wreg_o
 );
     always @(*) begin
         if (rst == `RstEnable) begin

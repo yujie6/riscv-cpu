@@ -110,6 +110,7 @@ module id(input wire rst,
                 end
                 
                 `EXE_BRANCH: begin
+                    // if compare returns 1, jumps to pc+imm
                     wreg_o      <= `WriteDisable;
                     imm_o       <= imm_b;
                     reg1_read_o <= `ReadEnable;
@@ -175,7 +176,7 @@ module id(input wire rst,
                     reg1_o      <= reg1_data_i;
                     imm_o       <= imm_i;
                     case (funct3)
-                        // FIXME: where is SLTU
+                        // TODO: where is SLTU
                         `EXE_ADDI: begin
                             // 12-bit imm sign extended, then reg[rd] <= imm + reg[rs1]
                             aluop_o  <= `EXE_ADDI_OP;
