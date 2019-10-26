@@ -8,6 +8,7 @@ module ex(input wire rst,
           input wire [`RegAddrBus] shamt_i,
           input wire [`RegBus] imm_i,
           input wire [`RegAddrBus] rd_i,
+          input wire [`MemAddrBus] link_addr_i,
           input wire wreg_i,
           output reg [`RegAddrBus] rd_o,
           output reg wreg_o,
@@ -84,7 +85,7 @@ module ex(input wire rst,
 
     always @(*) begin
         if (rst == `RstEnable || alusel_i != `EXE_RES_JUMP_BRANCH) begin
-            
+            // FIXME:
         end
     end
     
@@ -117,6 +118,7 @@ module ex(input wire rst,
                 wdata_o    <= 0;
                 mem_addr_o <= mem_out;
             end
+            `EXE_RES_JUMP_BRANCH: wdata_o <= link_addr_i;
             default : begin
                 wdata_o <= `ZeroWord;
             end

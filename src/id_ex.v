@@ -9,6 +9,7 @@ module id_ex(input wire clk,
              input wire [`RegBus] id_imm,
              input wire [`RegAddrBus] id_shamt,
              input wire [`RegAddrBus] id_wd,
+             input wire [`MemAddrBus] id_link_addr,
              input wire id_wreg,
              output reg [`AluOpBus] ex_aluop,
              output reg [`AluSelBus] ex_alusel,
@@ -17,6 +18,7 @@ module id_ex(input wire clk,
              output reg [`RegAddrBus] ex_shamt,
              output reg [`RegBus] ex_imm,
              output reg [`RegAddrBus] ex_wd,
+             output reg [`MemAddrBus] ex_link_addr,
              output reg ex_wreg);
     always @ (posedge clk) begin
         if (rst == `RstEnable) begin
@@ -28,6 +30,7 @@ module id_ex(input wire clk,
             ex_shamt  <= 5'b00000;
             ex_wd     <= `NOPRegAddr;
             ex_wreg   <= `WriteDisable;
+            ex_link_addr <= {17{1'b0}};
             end else begin
             ex_aluop  <= id_aluop;
             ex_alusel <= id_alusel;
@@ -37,6 +40,7 @@ module id_ex(input wire clk,
             ex_imm    <= id_imm;
             ex_wd     <= id_wd;
             ex_wreg   <= id_wreg;
+            ex_link_addr <= id_link_addr;
         end
     end
     

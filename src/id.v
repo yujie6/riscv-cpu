@@ -16,6 +16,9 @@ module id(input wire rst,
           output reg [`RegBus] imm_o,           // send imm to id_ex
           output reg [`RegAddrBus] shamt_o,
           output reg [`RegAddrBus] rd_o,
+          output reg [`InstAddrBus] branch_target_addr_o,
+          output reg [`InstAddrBus] link_addr_o,
+          output reg branch_flag_o,
           output reg wreg_o);
     wire [2:0] funct3      = inst_i[14:12];
     wire [6:0] funct7      = inst_i[31:25];
@@ -23,7 +26,11 @@ module id(input wire rst,
     wire [`RegAddrBus] rs1 = inst_i[19:15];
     wire [`RegAddrBus] rs2 = inst_i[24:20];
     wire [`RegAddrBus] rd  = inst_i[11:7];
-    
+    wire [`RegBus] pc_4;
+    wire [`RegBus] pc_8;
+    assign pc_4 = pc_i + 4;
+    assign pc_8 = pc_i + 8;
+    // imm computing
     wire [`RegBus] imm_i = {
     {20{1'b0}}, inst_i[31:20]
     };
@@ -70,8 +77,6 @@ module id(input wire rst,
             reg2_o      <= `ZeroWord;
             imm_o       <= `ZeroWord;
             shamt_o     <= 5'b00000;
-            // should not declare here, as the instructions here are
-            // parallel ??
             reg1_addr_o <= rs1;
             reg2_addr_o <= rs2;
             case (opcode)
@@ -97,6 +102,10 @@ module id(input wire rst,
                     wreg_o  <= `WriteEnable;
                     imm_o   <= imm_j;
                     rd_o    <= rd;
+                    // FIXME:
+                    link_addr_o <= pc_8;
+                    branch_flag_o <= 1'b1;
+                    // branch_target_addr_o <= ;
                 end
                 
                 `EXE_JALR: begin
@@ -111,6 +120,7 @@ module id(input wire rst,
                 
                 `EXE_BRANCH: begin
                     // if compare returns 1, jumps to pc+imm
+                    // TODO: all compare are done here in ID
                     wreg_o      <= `WriteDisable;
                     imm_o       <= imm_b;
                     reg1_read_o <= `ReadEnable;
