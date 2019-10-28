@@ -7,7 +7,7 @@
 `define ZeroWord 32'h00000000 //32 bit 0 word
 `define WriteEnable 1'b1
 `define WriteDisable 1'b0
-`define AluOpBus 7:0
+`define AluOpBus 6:0
 `define AluSelBus 2:0
 `define ChipEnable 1'b1
 `define ChipDisable 1'b0
@@ -131,6 +131,14 @@
 `define EXE_RES_MUL         3'b101
 `define EXE_RES_JUMP_BRANCH 3'b110
 `define EXE_RES_LOAD_STORE  3'b111
+
+
+// -------------- MemSel -------------------------------
+`define MemSelBus 1:0 
+`define MEM_NOP 2'b00
+`define MEM_BYTE 2'b01
+`define MEM_HALF 2'b10 
+`define MEM_WORD 2'b11   
 
 
 // -------------- macros related to rom ----------------------

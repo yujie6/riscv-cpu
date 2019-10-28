@@ -8,15 +8,17 @@ module ex(input wire rst,
           input wire [`RegAddrBus] shamt_i,
           input wire [`RegBus] imm_i,
           input wire [`RegAddrBus] rd_i,
-          input wire [`MemAddrBus] link_addr_i,
+          input wire [`MemAddrBus] link_addr_i, 
           input wire wreg_i,
           output reg [`RegAddrBus] rd_o,
           output reg wreg_o,
           output reg [`RegBus] wdata_o,
-          output reg [`MemAddrBus] mem_addr_o,
-          output wire [`AluOpBus] aluop_o);
-    
+          output reg [`MemAddrBus] mem_addr_o, // send to mem
+          output wire [`AluOpBus] aluop_o, // send to MEM(for LD and SD)
+          output wire [`RegBus] reg2_o); 
+    // FIXME: JUMP and LINK PROBLEM still remains 
     assign aluop_o = aluop_i;
+    assign reg2_o = reg2_i;
     
     reg [`RegBus] logic_out;
     reg [`RegBus] shift_out;
@@ -95,13 +97,6 @@ module ex(input wire rst,
         end
         else begin
             mem_addr_o <= reg1_i + $signed(imm_i);
-            // case (aluop_i)
-            //     `EXE_BEQ_OP: begin
-                    
-            //     end
-            //     default: begin
-            //     end
-            // endcase
         end
     end
     

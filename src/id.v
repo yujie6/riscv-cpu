@@ -102,7 +102,7 @@ module id(input wire rst,
                     wreg_o  <= `WriteEnable;
                     imm_o   <= imm_j;
                     rd_o    <= rd;
-                    // FIXME:
+                    // FIXME:  how to link and connect with pc_reg
                     link_addr_o <= pc_8;
                     branch_flag_o <= 1'b1;
                     // branch_target_addr_o <= ;

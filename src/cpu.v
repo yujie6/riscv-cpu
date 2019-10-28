@@ -11,7 +11,7 @@ module cpu(input wire clk_in,
            output wire [31:0] dbgreg_dout);
     
     // implementation goes here
-    
+    // REVIEW: API NEEDS to be checked
     // Specifications:
     // - Pause cpu(freeze pc, registers, etc.) when rdy_in is low
     // - Memory read takes 2 cycles(wait till next cycle), write takes 1 cycle(no need to wait)
@@ -47,14 +47,22 @@ module cpu(input wire clk_in,
     wire ex_wreg_o;
     wire [`RegAddrBus] ex_wd_o;
     wire [`RegBus] ex_wdata_o;
-    
+    wire [`AluOpBus] ex_aluop_o;
+    wire [`RegBus] ex_reg2_o;
+    wire [`MemAddrBus] ex_memaddr_o;
+ 
     wire mem_wreg_i;
     wire [`RegAddrBus] mem_wd_i;
     wire [`RegBus] mem_wdata_i;
+    wire [`AluOpBus] mem_aluop_i;
+    wire [`RegBus] mem_reg2_i;
+    wire [`MemAddrBus] mem_addr_i;
     
     wire mem_wreg_o;
     wire [`RegAddrBus] mem_wd_o;
     wire [`RegBus] mem_wdata_o;
+    wire [`MemSelBus] mem_sel_o;
+    wire [`MemAddrBus] mem_addr_o;
     
     wire wb_wreg_i;
     wire [`RegAddrBus] wb_wd_i;
@@ -156,13 +164,15 @@ module cpu(input wire clk_in,
     .ex_rd(ex_wd_o),
     // output to mem
     .mem_wdata(mem_wdata_i), .mem_wreg(mem_wreg_i),
-    .mem_rd(mem_wd_i)
+    .mem_rd(mem_wd_i), .mem_addr(mem_addr_i), 
+    .mem_aluop(mem_aluop_i)
     );
-    
+    // FIXME: PORTS CHECKING (NUMBER AND NAMES)
     mem mem0(
     // input from ex_mem
     .rst(rst_in), .wreg_i(mem_wreg_i),
     .wdata_i(mem_wdata_i), .rd_i(mem_wd_i),
+    .aluop_i(mem_aluop_i),
     // output to mem_wb
     .wreg_o(mem_wreg_o), .wdata_o(mem_wdata_o),
     .rd_o(mem_wd_o)
