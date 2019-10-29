@@ -28,7 +28,7 @@ module mem(input wire rst,
             rd_o     <= rd_i;
             wdata_o  <= wdata_i;
             wreg_o   <= wreg_i;
-            
+            // FIXME: Should not go this way, all decode shall be done in ID
             case (aluop_i)
                 `EXE_SB_OP: begin
                     mem_sel_o   <= `MEM_BYTE;

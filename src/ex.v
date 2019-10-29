@@ -16,7 +16,6 @@ module ex(input wire rst,
           output reg [`MemAddrBus] mem_addr_o, // send to mem
           output wire [`AluOpBus] aluop_o, // send to MEM(for LD and SD)
           output wire [`RegBus] reg2_o); 
-    // FIXME: JUMP and LINK PROBLEM still remains 
     assign aluop_o = aluop_i;
     assign reg2_o = reg2_i;
     
@@ -87,7 +86,8 @@ module ex(input wire rst,
 
     always @(*) begin
         if (rst == `RstEnable || alusel_i != `EXE_RES_JUMP_BRANCH) begin
-            // FIXME:
+        end else begin
+            // NOTE: perhaps we can do something here....            
         end
     end
     

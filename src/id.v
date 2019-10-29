@@ -1,19 +1,19 @@
 `include "defines.v"
 
 module id(input wire rst,
-          input wire [`InstAddrBus] pc_i,       // Read from IF_ID
+          input wire [`InstAddrBus] pc_i,                 // Read from IF_ID
           input wire [`InstBus] inst_i,
-          input wire [`RegBus] reg1_data_i,     // Read from regfile
+          input wire [`RegBus] reg1_data_i,               // Read from regfile
           input wire [`RegBus] reg2_data_i,
-          output reg reg1_read_o,               // Output to regfile
+          output reg reg1_read_o,                         // Output to regfile
           output reg reg2_read_o,
           output reg [`RegAddrBus] reg1_addr_o,
           output reg [`RegAddrBus] reg2_addr_o,
-          output reg [`AluOpBus] aluop_o,       // Data sends to EX
-          output reg [`AluSelBus] alusel_o,     // how to deal ? what's the logic
+          output reg [`AluOpBus] aluop_o,                 // Data sends to EX
+          output reg [`AluSelBus] alusel_o,               // how to deal ? what's the logic
           output reg [`RegBus] reg1_o,
           output reg [`RegBus] reg2_o,
-          output reg [`RegBus] imm_o,           // send imm to id_ex
+          output reg [`RegBus] imm_o,                     // send imm to id_ex
           output reg [`RegAddrBus] shamt_o,
           output reg [`RegAddrBus] rd_o,
           output reg [`InstAddrBus] branch_target_addr_o,
@@ -98,53 +98,83 @@ module id(input wire rst,
                 
                 `EXE_JAL: begin
                     // jump to imm_j and write pc+4 to rd
-                    aluop_o <= `EXE_JAL_OP;
-                    wreg_o  <= `WriteEnable;
-                    imm_o   <= imm_j;
-                    rd_o    <= rd;
-                    // FIXME:  how to link and connect with pc_reg
-                    link_addr_o <= pc_8;
-                    branch_flag_o <= 1'b1;
+                    aluop_o                 <= `EXE_JAL_OP;
+                    alusel_o                <= `EXE_RES_JUMP_BRANCH;
+                    wreg_o                  <= `WriteEnable;
+                    imm_o                   <= imm_j;
+                    rd_o                    <= rd;
+                    link_addr_o             <= pc_4;
+                    branch_flag_o           <= 1'b1;
+                    branch_target_addr_o    <= imm_j;
                     // branch_target_addr_o <= ;
                 end
                 
                 `EXE_JALR: begin
                     // jump to reg[rs1] + imm_i
-                    aluop_o     <= `EXE_JALR_OP;
-                    wreg_o      <= `WriteEnable;
-                    imm_o       <= imm_i;
-                    rd_o        <= rd;
-                    reg1_read_o <= `ReadEnable;
-                    reg1_o      <= reg1_data_i;
+                    aluop_o              <= `EXE_JALR_OP;
+                    alusel_o             <= `EXE_RES_JUMP_BRANCH;
+                    wreg_o               <= `WriteEnable;
+                    imm_o                <= imm_i;
+                    rd_o                 <= rd;
+                    reg1_read_o          <= `ReadEnable;
+                    reg1_o               <= reg1_data_i;
+                    branch_flag_o        <= 1'b1;
+                    branch_target_addr_o <= `ZeroWord;
                 end
                 
                 `EXE_BRANCH: begin
                     // if compare returns 1, jumps to pc+imm
                     // TODO: all compare are done here in ID
                     wreg_o      <= `WriteDisable;
+                    rd_o        <= `NOPRegAddr;
                     imm_o       <= imm_b;
                     reg1_read_o <= `ReadEnable;
                     reg2_read_o <= `ReadEnable;
                     reg1_o      <= reg1_data_i;
                     reg2_o      <= reg2_data_i;
+                    alusel_o    <= `EXE_RES_JUMP_BRANCH;
                     case (funct3)
                         `EXE_BEQ: begin
                             aluop_o <= `EXE_BEQ_OP;
+                            if (reg1_o == reg2_o) begin
+                                branch_target_addr_o <= pc_i + $signed(imm_b);
+                                branch_flag_o        <= 1'b1;
+                            end
                         end
                         `EXE_BNE: begin
                             aluop_o <= `EXE_BNE_OP;
+                            if (reg1_o ! = reg2_o) begin
+                                branch_target_addr_o <= pc_i + $signed(imm_b);
+                                branch_flag_o        <= 1'b1;
+                            end
                         end
                         `EXE_BLT: begin
                             aluop_o <= `EXE_BLT_OP;
+                            if ($signed(reg1_o) < $signed(reg2_o)) begin
+                                branch_target_addr_o <= pc_i + $signed(imm_b);
+                                branch_flag_o        <= 1'b1;
+                            end
                         end
                         `EXE_BGE: begin
                             aluop_o <= `EXE_BGE_OP;
+                            if ($signed(reg1_o) > $signed(reg2_o)) begin
+                                branch_target_addr_o <= pc_i + $signed(imm_b);
+                                branch_flag_o        <= 1'b1;
+                            end
                         end
                         `EXE_BLTU: begin
                             aluop_o <= `EXE_BLTU_OP;
+                            if (reg1_o < reg2_o) begin
+                                branch_target_addr_o <= pc_i + $signed(imm_b);
+                                branch_flag_o        <= 1'b1;
+                            end
                         end
                         `EXE_BGEU: begin
                             aluop_o <= `EXE_BGEU_OP;
+                            if (reg1_o == reg2_o) begin
+                                branch_target_addr_o <= pc_i + $signed(imm_b);
+                                branch_flag_o        <= 1'b1;
+                            end
                         end
                         default: begin
                         end
@@ -156,6 +186,9 @@ module id(input wire rst,
                     rd_o        <= rd;
                     reg1_read_o <= `ReadEnable;
                     reg1_o      <= reg1_data_i;
+                    reg2_read_o <= `ReadDisable;
+                    reg2_o      <= `ZeroWord;
+                    alusel_o    <= `EXE_RES_LOAD_STORE;
                     imm_o       <= imm_i;
                     case (funct3)
                         `EXE_LB: begin
@@ -176,6 +209,22 @@ module id(input wire rst,
                         default: begin
                             
                         end
+                    endcase
+                end
+                
+                `EXE_STORE: begin
+                    wreg_o      <= `WriteDisable;
+                    rd_o        <= `NOPRegAddr;
+                    reg1_read_o <= `ReadEnable;
+                    reg2_read_o <= `ReadEnable;
+                    reg1_o      <= reg1_data_i;
+                    reg2_o      <= reg2_data_i;
+                    imm_o       <= imm_s;
+                    case (funct3)
+                        `EXE_SB: ;
+                        `EXE_SH: ;
+                        `EXE_SW: ;
+                        default: ;
                     endcase
                 end
                 
@@ -213,7 +262,7 @@ module id(input wire rst,
                         end
                         `EXE_ANDI: begin
                             // almost the same as ADDI
-                            aluop_o <= `EXE_ANDI_OP;
+                            aluop_o  <= `EXE_ANDI_OP;
                             alusel_o <= `EXE_RES_LOGIC;
                         end
                         `EXE_SLLI: begin
@@ -260,7 +309,7 @@ module id(input wire rst,
                             endcase
                         end
                         `EXE_SLL: begin
-                            aluop_o <= `EXE_SLL_OP;
+                            aluop_o  <= `EXE_SLL_OP;
                             alusel_o <= `EXE_RES_SHIFT;
                         end
                         `EXE_SLT: begin

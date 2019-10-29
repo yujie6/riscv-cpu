@@ -34,8 +34,12 @@ module cpu(input wire clk_in,
     wire [`RegAddrBus] id_shamt_o;
     wire id_wreg_o;
     wire [`RegAddrBus] id_wd_o;
+    wire [`MemAddrBus] id_branch_target_addr_o;
+    wire id_branch_flag_o;
+    wire [`MemAddrBus] id_link_addr_o;
     
     wire [`AluOpBus] ex_aluop_i;
+    wire [`MemAddrBus] ex_link_addr_i;
     wire [`AluSelBus] ex_alusel_i;
     wire [`RegBus] ex_reg1_i;
     wire [`RegBus] ex_reg2_i;
@@ -96,7 +100,9 @@ module cpu(input wire clk_in,
     
     pc_reg pc_reg0(
     .clk(clk_in), .rst(rst_in),
-    .pc(pc), .ce(rst_in)
+    .pc(pc), .ce(rst_in),
+    .branch_flag(id_branch_flag_o),
+    .branch_addr_i(id_branch_target_addr_o)
     );
     
     assign mem_addr = pc;
@@ -115,6 +121,8 @@ module cpu(input wire clk_in,
     // data send to regfile
     .reg1_read_o(reg1_read), .reg2_read_o(reg2_read),
     .reg1_addr_o(reg1_addr), .reg2_addr_o(reg2_addr),
+    .branch_target_addr_o(id_branch_target_addr_o),
+    .branch_flag_o(id_branch_flag_o),
     // data send to ed_ex
     .aluop_o(id_aluop_o), .alusel_o(id_alusel_o),
     .reg1_o(id_reg1_o), .reg2_o(id_reg2_o),
@@ -138,11 +146,13 @@ module cpu(input wire clk_in,
     .id_wd(id_wd_o), .id_wreg(id_wreg_o),
     .id_alusel(id_alusel_o), .id_aluop(id_aluop_o),
     .id_imm(id_imm_o), .id_shamt(id_shamt_o),
+    .id_link_addr(id_link_addr_o),
     // data send to ex
     .ex_reg1(ex_reg1_i), .ex_reg2(ex_reg2_i),
     .ex_wd(ex_wd_i), .ex_wreg(ex_wreg_i),
     .ex_aluop(ex_aluop_i), .ex_alusel(ex_alusel_i),
-    .ex_imm(ex_imm_i), .ex_shamt(ex_shamt_i)
+    .ex_imm(ex_imm_i), .ex_shamt(ex_shamt_i),
+    .ex_link_addr(ex_link_addr_i)
     );
     
     ex ex0(
@@ -152,6 +162,7 @@ module cpu(input wire clk_in,
     .aluop_i(ex_aluop_i), .alusel_i(ex_alusel_i),
     .wreg_i(ex_wreg_i), .imm_i(ex_imm_i),
     .shamt_i(ex_shamt_i),
+    .link_addr_i(ex_link_addr_i),
     // output to ex_mem
     .rd_o(ex_wd_o), .wdata_o(ex_wdata_o),
     .wreg_o(ex_wreg_o), .mem_addr_o(mem_addr)
