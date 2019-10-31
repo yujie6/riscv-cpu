@@ -66,6 +66,7 @@ module id(input wire rst,
             imm_o       <= 32'h0;
             shamt_o     <= 5'b00000;
             end else begin
+            // $display(inst_i);
             aluop_o     <= `EXE_NOP_OP;
             alusel_o    <= `EXE_RES_NOP;
             rd_o        <= `NOPRegAddr;
@@ -143,7 +144,7 @@ module id(input wire rst,
                         end
                         `EXE_BNE: begin
                             aluop_o <= `EXE_BNE_OP;
-                            if (reg1_o ! = reg2_o) begin
+                            if (reg1_o != reg2_o) begin
                                 branch_target_addr_o <= pc_i + $signed(imm_b);
                                 branch_flag_o        <= 1'b1;
                             end

@@ -5,13 +5,15 @@ module cpu(input wire clk_in,
            input wire rst_in,
            input wire rdy_in,
            input wire [7:0] mem_din,
-           output wire [7:0] mem_dout,
+           output wire [7:0] mem_dout, 
            output wire [31:0] mem_addr,
            output wire mem_wr,
            output wire [31:0] dbgreg_dout);
-    
+    // REVIEW: RAM read and write 1 byte per cycle
+    // REVIEW: Thus we need to wait 3 cycles when there is a word write | read    
+
+
     // implementation goes here
-    // REVIEW: API NEEDS to be checked
     // Specifications:
     // - Pause cpu(freeze pc, registers, etc.) when rdy_in is low
     // - Memory read takes 2 cycles(wait till next cycle), write takes 1 cycle(no need to wait)
@@ -21,11 +23,11 @@ module cpu(input wire clk_in,
     // - 0x30000 write: write a byte to output (write 0x00 is ignored)
     // - 0x30004 read: read clocks passed since cpu starts (in dword, 4 bytes)
     // - 0x30004 write: indicates program stop (will output '\0' through uart tx)
-    
+    wire [`InstBus] first_inst = {{11{1'b1}},{5'b00010},{3'b110},{5'b00100},{7'b0010011}};
     wire [`InstAddrBus] pc;
     wire [`InstAddrBus] id_pc_i;
     wire [`InstBus] id_inst_i;
-    
+    assign id_inst_i = first_inst;
     wire [`AluOpBus] id_aluop_o;
     wire [`AluSelBus] id_alusel_o;
     wire [`RegBus] id_reg1_o;
@@ -83,25 +85,24 @@ module cpu(input wire clk_in,
     begin
         if (rst_in)
         begin
-            mem_dout    <= 8'b00000000;
-            mem_wr      <= `WriteDisable;
-            mem_addr    <= `ZeroWord;
-            dbgreg_dout <= `ZeroWord;
+            //$display(id_inst_i);
         end
         else if (!rdy_in)
         begin
+            //$display(id_inst_i);
             // Pause
         end
         else
         begin
             
+            $display(first_inst);
         end
     end
     
     pc_reg pc_reg0(
     .clk(clk_in), .rst(rst_in),
     .pc(pc), .ce(rst_in),
-    .branch_flag(id_branch_flag_o),
+    .branch_flag_i(id_branch_flag_o),
     .branch_addr_i(id_branch_target_addr_o)
     );
     
@@ -117,7 +118,7 @@ module cpu(input wire clk_in,
     id id0(
     .rst(rst_in), .pc_i(id_pc_i), .inst_i(id_inst_i),
     // input from regfile
-    .reg1_addr_i(reg1_data), .reg2_data_i(reg2_data),
+    .reg1_data_i(reg1_data), .reg2_data_i(reg2_data),
     // data send to regfile
     .reg1_read_o(reg1_read), .reg2_read_o(reg2_read),
     .reg1_addr_o(reg1_addr), .reg2_addr_o(reg2_addr),
@@ -183,7 +184,12 @@ module cpu(input wire clk_in,
     // input from ex_mem
     .rst(rst_in), .wreg_i(mem_wreg_i),
     .wdata_i(mem_wdata_i), .rd_i(mem_wd_i),
-    .aluop_i(mem_aluop_i),
+    .aluop_i(mem_aluop_i), 
+    .mem_sel_o(mem_sel_o),
+    .mem_wdata_o(),
+    .mem_addr_o(),
+    .mem_we_o(),
+    .mem_ce_o(),
     // output to mem_wb
     .wreg_o(mem_wreg_o), .wdata_o(mem_wdata_o),
     .rd_o(mem_wd_o)
