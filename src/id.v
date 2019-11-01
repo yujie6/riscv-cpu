@@ -63,10 +63,11 @@ module id(input wire rst,
             reg2_read_o <= 1'b0;
             reg1_addr_o <= `NOPRegAddr;
             reg2_addr_o <= `NOPRegAddr;
+            branch_target_addr_o <= `NOPInstAddr;
+            branch_flag_o <= 1'b0;
             imm_o       <= 32'h0;
             shamt_o     <= 5'b00000;
             end else begin
-            // $display(inst_i);
             aluop_o     <= `EXE_NOP_OP;
             alusel_o    <= `EXE_RES_NOP;
             rd_o        <= `NOPRegAddr;
@@ -77,6 +78,8 @@ module id(input wire rst,
             reg1_o      <= `ZeroWord;
             reg2_o      <= `ZeroWord;
             imm_o       <= `ZeroWord;
+            branch_target_addr_o <= `NOPInstAddr;
+            branch_flag_o <= 1'b0;
             shamt_o     <= 5'b00000;
             reg1_addr_o <= rs1;
             reg2_addr_o <= rs2;
@@ -258,6 +261,7 @@ module id(input wire rst,
                         end
                         `EXE_ORI: begin
                             // almost the same as ADDI
+                            $display("Ori detected");
                             aluop_o  <= `EXE_ORI_OP;
                             alusel_o <= `EXE_RES_LOGIC;
                         end

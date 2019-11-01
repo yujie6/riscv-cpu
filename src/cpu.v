@@ -8,6 +8,7 @@ module cpu(input wire clk_in,
            output wire [7:0] mem_dout, 
            output wire [31:0] mem_addr,
            output wire mem_wr,
+           output wire rom_ce_o,
            output wire [31:0] dbgreg_dout);
     // REVIEW: RAM read and write 1 byte per cycle
     // REVIEW: Thus we need to wait 3 cycles when there is a word write | read    
@@ -23,11 +24,12 @@ module cpu(input wire clk_in,
     // - 0x30000 write: write a byte to output (write 0x00 is ignored)
     // - 0x30004 read: read clocks passed since cpu starts (in dword, 4 bytes)
     // - 0x30004 write: indicates program stop (will output '\0' through uart tx)
-    wire [`InstBus] first_inst = {{11{1'b1}},{5'b00010},{3'b110},{5'b00100},{7'b0010011}};
+    wire [`InstBus] first_inst = {{12{1'b1}},{5'b00010},{3'b110},{5'b00100},{7'b0010011}};
     wire [`InstAddrBus] pc;
     wire [`InstAddrBus] id_pc_i;
     wire [`InstBus] id_inst_i;
-    assign id_inst_i = first_inst;
+    //assign id_inst_i = {first_inst};
+    //assign mem_din = first_inst;
     wire [`AluOpBus] id_aluop_o;
     wire [`AluSelBus] id_alusel_o;
     wire [`RegBus] id_reg1_o;
@@ -85,23 +87,21 @@ module cpu(input wire clk_in,
     begin
         if (rst_in)
         begin
-            //$display(id_inst_i);
+
         end
         else if (!rdy_in)
         begin
-            //$display(id_inst_i);
-            // Pause
+        
         end
         else
         begin
             
-            $display(first_inst);
         end
     end
     
     pc_reg pc_reg0(
     .clk(clk_in), .rst(rst_in),
-    .pc(pc), .ce(rst_in),
+    .pc(pc), .ce(rom_ce_o),
     .branch_flag_i(id_branch_flag_o),
     .branch_addr_i(id_branch_target_addr_o)
     );
@@ -111,7 +111,8 @@ module cpu(input wire clk_in,
     
     if_id if_id0(
     .clk(clk_in), .rst(rst_in), .if_pc(pc),
-    .if_inst(mem_din), .id_pc(id_pc_i),
+    .if_inst(first_inst), // supposed to be mem_din (but it's only 1 byte) 
+    .id_pc(id_pc_i),
     .id_inst(id_inst_i)
     );
     

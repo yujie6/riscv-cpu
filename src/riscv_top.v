@@ -16,6 +16,7 @@ module riscv_top#(parameter SIM = 0)
     reg rst_delay; // TODO: delay??
     
     wire clk;
+    wire rom_ce;
     
     // assign EXCLK (or your own clock module) to clk
     assign clk = EXCLK;
@@ -81,7 +82,7 @@ module riscv_top#(parameter SIM = 0)
     .mem_dout(cpu_ram_dout),
     .mem_addr(cpu_ram_a),
     .mem_wr(cpu_ram_wr),
-    
+    .rom_ce_o(rom_ce),
     .dbgreg_dout(cpu_dbgreg_dout)    // demo
     );
     

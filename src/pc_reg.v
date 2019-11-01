@@ -5,7 +5,8 @@ module pc_reg(input wire clk,
               input wire branch_flag_i,
               input wire [`MemAddrBus] branch_addr_i,
               output reg[`InstAddrBus] pc,
-              output reg ce);
+              output reg ce
+              );
     always @(posedge clk) begin
         if (rst == `RstEnable) begin
             ce <= `ChipDisable;

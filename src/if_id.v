@@ -13,8 +13,6 @@ module if_id(input wire clk,
             id_pc   <= `ZeroWord;
             id_inst <= `ZeroWord;
             end else begin
-            $display("if_inst is");
-            $display(if_inst);
             id_pc   <= if_pc;
             id_inst <= if_inst;
         end

@@ -151,8 +151,10 @@
 `define RegAddrBus 4:0 // len of Regfile address
 `define RegBus 31:0 // number of registers in Regfile
 `define RegWidth 32
+`define InstAddrWidth 17
 `define RegNum 32
 `define NOPRegAddr 5'b00000
+`define NOPInstAddr {17{1'b0}}
 `define RegNumLog2 32
 
 `endif
