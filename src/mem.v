@@ -78,7 +78,9 @@ module mem(input wire rst,
                     mem_we_o   <= `WriteDisable;
                     wdata_o    <= mem_data_i;
                 end
-                default: ;
+                default: begin
+                    mem_we_o <= `WriteDisable;
+                end
             endcase
         end
     end

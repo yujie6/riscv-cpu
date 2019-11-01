@@ -75,8 +75,6 @@ module id(input wire rst,
             instvalid   <= `InstInvalid;
             reg1_read_o <= `ReadDisable;
             reg2_read_o <= `ReadDisable;
-            reg1_o      <= `ZeroWord;
-            reg2_o      <= `ZeroWord;
             imm_o       <= `ZeroWord;
             branch_target_addr_o <= `NOPInstAddr;
             branch_flag_o <= 1'b0;
@@ -121,7 +119,6 @@ module id(input wire rst,
                     imm_o                <= imm_i;
                     rd_o                 <= rd;
                     reg1_read_o          <= `ReadEnable;
-                    reg1_o               <= reg1_data_i;
                     branch_flag_o        <= 1'b1;
                     branch_target_addr_o <= `ZeroWord;
                 end
@@ -134,8 +131,6 @@ module id(input wire rst,
                     imm_o       <= imm_b;
                     reg1_read_o <= `ReadEnable;
                     reg2_read_o <= `ReadEnable;
-                    reg1_o      <= reg1_data_i;
-                    reg2_o      <= reg2_data_i;
                     alusel_o    <= `EXE_RES_JUMP_BRANCH;
                     case (funct3)
                         `EXE_BEQ: begin
@@ -189,9 +184,7 @@ module id(input wire rst,
                     wreg_o      <= `WriteEnable;
                     rd_o        <= rd;
                     reg1_read_o <= `ReadEnable;
-                    reg1_o      <= reg1_data_i;
                     reg2_read_o <= `ReadDisable;
-                    reg2_o      <= `ZeroWord;
                     alusel_o    <= `EXE_RES_LOAD_STORE;
                     imm_o       <= imm_i;
                     case (funct3)
@@ -221,8 +214,6 @@ module id(input wire rst,
                     rd_o        <= `NOPRegAddr;
                     reg1_read_o <= `ReadEnable;
                     reg2_read_o <= `ReadEnable;
-                    reg1_o      <= reg1_data_i;
-                    reg2_o      <= reg2_data_i;
                     imm_o       <= imm_s;
                     case (funct3)
                         `EXE_SB: ;
@@ -236,7 +227,7 @@ module id(input wire rst,
                     wreg_o      <= `WriteEnable;
                     rd_o        <= rd;
                     reg1_read_o <= `ReadEnable;
-                    reg1_o      <= reg1_data_i;
+                    // reg1_o      <= reg1_data_i; NOTE: CANNOT PLACE HERE
                     imm_o       <= imm_i;
                     case (funct3)
                         // TODO: where is SLTU
@@ -295,8 +286,6 @@ module id(input wire rst,
                     rd_o        <= rd;
                     reg1_read_o <= `ReadEnable;
                     reg2_read_o <= `ReadEnable;
-                    reg1_o      <= reg1_data_i;
-                    reg2_o      <= reg2_data_i;
                     case (funct3)
                         `EXE_ADD_SUB: begin
                             case (funct7)
