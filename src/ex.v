@@ -12,7 +12,7 @@ module ex(input wire rst,
           input wire wreg_i,
           output reg [`RegAddrBus] rd_o,
           output reg wreg_o,
-          output reg [`RegBus] wdata_o,
+          output reg [`RegBus] wdata_o, // write to rd & data forwarding
           output reg [`MemAddrBus] mem_addr_o, // send to mem
           output wire [`AluOpBus] aluop_o, // send to MEM(for LD and SD)
           output wire [`RegBus] reg2_o); 

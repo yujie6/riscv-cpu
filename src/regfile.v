@@ -19,7 +19,7 @@ module regfile(input wire clk,
         regs[0] <= `ZeroWord;
         regs[4] <= 32'h11113333;
     end
-
+    
     // genvar i;
     // generate
     // for (i = 0; i < 32; i = i + 1) begin : label

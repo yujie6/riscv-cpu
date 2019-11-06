@@ -8,7 +8,8 @@
 
 module StallControler(
     input wire rst,
-    input wire clk
+    input wire clk,
+    output wire [31:0] stall
 );
 
 endmodule // StallControler

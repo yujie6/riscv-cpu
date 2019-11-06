@@ -5,15 +5,15 @@ module cpu(input wire clk_in,
            input wire rst_in,
            input wire rdy_in,
            input wire [7:0] mem_din,
-           output wire [7:0] mem_dout, 
+           output wire [7:0] mem_dout,
            output wire [31:0] mem_addr,
            output wire mem_wr,
            output wire rom_ce_o,
            output wire [31:0] dbgreg_dout);
     // REVIEW: RAM read and write 1 byte per cycle
-    // REVIEW: Thus we need to wait 3 cycles when there is a word write | read    
-
-
+    // REVIEW: Thus we need to wait 3 cycles when there is a word write | read
+    
+    
     // implementation goes here
     // Specifications:
     // - Pause cpu(freeze pc, registers, etc.) when rdy_in is low
@@ -29,7 +29,7 @@ module cpu(input wire clk_in,
     wire [`InstAddrBus] id_pc_i;
     wire [`InstBus] id_inst_i;
     //assign id_inst_i = {first_inst};
-    //assign mem_din = first_inst;
+    //assign mem_din   = first_inst;
     wire [`AluOpBus] id_aluop_o;
     wire [`AluSelBus] id_alusel_o;
     wire [`RegBus] id_reg1_o;
@@ -58,7 +58,7 @@ module cpu(input wire clk_in,
     wire [`AluOpBus] ex_aluop_o;
     wire [`RegBus] ex_reg2_o;
     wire [`MemAddrBus] ex_memaddr_o;
- 
+    
     wire mem_wreg_i;
     wire [`RegAddrBus] mem_wd_i;
     wire [`RegBus] mem_wdata_i;
@@ -87,17 +87,29 @@ module cpu(input wire clk_in,
     begin
         if (rst_in)
         begin
-
+            
         end
         else if (!rdy_in)
         begin
-        
+            
         end
         else
         begin
             
         end
     end
+    
+    MemController MemControl0(
+    .rst_i(rst_in),
+    .clk_i(clk_in),
+    .mem_addr_i(mem_addr_o),
+    .mem_sel_i(mem_sel_o),
+    .we(mem_wd_o),
+    .mem_byte_i(mem_din),
+    .we_byte_o(mem_dout),
+    .byte_addr_o(mem_addr), // send to ram.v
+    .mem_data_o()
+    );
     
     pc_reg pc_reg0(
     .clk(clk_in), .rst(rst_in),
@@ -111,7 +123,7 @@ module cpu(input wire clk_in,
     
     if_id if_id0(
     .clk(clk_in), .rst(rst_in), .if_pc(pc),
-    .if_inst(first_inst), // supposed to be mem_din (but it's only 1 byte) 
+    .if_inst(first_inst), // supposed to be mem_din (but it's only 1 byte)
     .id_pc(id_pc_i),
     .id_inst(id_inst_i)
     );
@@ -129,7 +141,13 @@ module cpu(input wire clk_in,
     .aluop_o(id_aluop_o), .alusel_o(id_alusel_o),
     .reg1_o(id_reg1_o), .reg2_o(id_reg2_o),
     .rd_o(id_wd_o), .wreg_o(id_wreg_o),
-    .imm_o(id_imm_o), .shamt_o(id_shamt_o)
+    .imm_o(id_imm_o), .shamt_o(id_shamt_o),
+    // data forwarding from ex
+    .ex_wd_forward(ex_wd_o), .ex_wdata_forward(ex_wdata_o),
+    .ex_wreg_forward(ex_wreg_o),
+    // data forwarding from mem
+    .mem_wd_forward(mem_wd_o), .mem_wdata_forward(mem_wdata_o),
+    .mem_wreg_forward(mem_wreg_o)
     );
     
     regfile regfile0(
@@ -177,7 +195,7 @@ module cpu(input wire clk_in,
     .ex_rd(ex_wd_o),
     // output to mem
     .mem_wdata(mem_wdata_i), .mem_wreg(mem_wreg_i),
-    .mem_rd(mem_wd_i), .mem_addr(mem_addr_i), 
+    .mem_rd(mem_wd_i), .mem_addr(mem_addr_i),
     .mem_aluop(mem_aluop_i)
     );
     // FIXME: PORTS CHECKING (NUMBER AND NAMES)
@@ -185,12 +203,13 @@ module cpu(input wire clk_in,
     // input from ex_mem
     .rst(rst_in), .wreg_i(mem_wreg_i),
     .wdata_i(mem_wdata_i), .rd_i(mem_wd_i),
-    .aluop_i(mem_aluop_i), 
+    .aluop_i(mem_aluop_i),
     .mem_sel_o(mem_sel_o),
     .mem_wdata_o(),
     .mem_addr_o(),
     .mem_we_o(),
     .mem_ce_o(),
+    .mem_data_i(),
     // output to mem_wb
     .wreg_o(mem_wreg_o), .wdata_o(mem_wdata_o),
     .rd_o(mem_wd_o)
