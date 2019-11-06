@@ -4,6 +4,8 @@
 // ----------------- basic macros ------------------------
 `define RstEnable 1'b1 //reset signal is 1
 `define RstDisable 1'b0 //reset signal is 0
+`define Stop 1'b1 // for stall controller
+`define NoStop 1'b0 
 `define ZeroWord 32'h00000000 //32 bit 0 word
 `define WriteEnable 1'b1
 `define WriteDisable 1'b0
@@ -118,6 +120,7 @@
 `define EXE_SUBI_OP  39
 `define EXE_LUI_OP  40
 `define EXE_AUIPC_OP 41 
+`define EXE_NOP_OP 42
 
 
 
@@ -151,10 +154,10 @@
 `define RegAddrBus 4:0 // len of Regfile address
 `define RegBus 31:0 // number of registers in Regfile
 `define RegWidth 32
-`define InstAddrWidth 17
+`define InstAddrWidth 32
 `define RegNum 32
 `define NOPRegAddr 5'b00000
-`define NOPInstAddr {17{1'b0}}
+`define NOPInstAddr {32{1'b0}}
 `define RegNumLog2 32
 
 `endif

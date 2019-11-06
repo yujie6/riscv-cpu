@@ -10,6 +10,7 @@ module ex_mem(
     input wire [`RegBus] ex_reg2,
     input wire [`RegBus] ex_wdata,
     input wire [`MemAddrBus] ex_memaddr,
+    input wire [5:0] stall,
     output reg[`RegAddrBus] mem_rd,
     output reg[`RegBus] mem_wdata,
     output reg[`MemAddrBus] mem_addr,
@@ -25,8 +26,15 @@ module ex_mem(
             mem_rd <= `NOPRegAddr;
             mem_wreg <= `WriteDisable;
             mem_wdata <= `ZeroWord;
-            
-        end else begin
+            mem_addr <= `ZeroWord;
+        end else if (stall[3] == `Stop && stall[4] == `NoStop) begin
+            mem_rd <= `NOPRegAddr;
+            mem_wreg <= `WriteDisable;
+            mem_wdata <= `ZeroWord;
+            mem_addr <= `ZeroWord;
+        end 
+        
+        else if (stall[3] == `NoStop) begin
             mem_rd <= ex_rd;
             mem_wdata <= ex_wdata;
             mem_wreg <= ex_wreg;

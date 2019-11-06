@@ -3,6 +3,7 @@
 module pc_reg(input wire clk,
               input wire rst,
               input wire branch_flag_i,
+              input wire [5:0] stall,
               input wire [`MemAddrBus] branch_addr_i,
               output reg[`InstAddrBus] pc,
               output reg ce
@@ -20,7 +21,7 @@ module pc_reg(input wire clk,
             pc <= `ZeroWord;
             end else if (branch_flag_i == 1'b1) begin
                 pc <= branch_addr_i;        
-            end else begin
+            end else if (stall[0] == `NoStop) begin
             pc <= pc + 4'h4;
         end
     end

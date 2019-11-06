@@ -82,6 +82,8 @@ module cpu(input wire clk_in,
     wire [`RegBus] reg2_data;
     wire [`RegAddrBus] reg1_addr;
     wire [`RegAddrBus] reg2_addr;
+
+    wire [5:0] stall_sign;
     
     always @(posedge clk_in)
     begin
@@ -110,10 +112,16 @@ module cpu(input wire clk_in,
     .byte_addr_o(mem_addr), // send to ram.v
     .mem_data_o()
     );
+
+    StallController StallController0(
+        .rst(rst_in),
+        .stall(stall_sign)
+    );
     
     pc_reg pc_reg0(
     .clk(clk_in), .rst(rst_in),
     .pc(pc), .ce(rom_ce_o),
+    .stall(stall_sign),
     .branch_flag_i(id_branch_flag_o),
     .branch_addr_i(id_branch_target_addr_o)
     );
@@ -123,6 +131,7 @@ module cpu(input wire clk_in,
     
     if_id if_id0(
     .clk(clk_in), .rst(rst_in), .if_pc(pc),
+    .stall(stall_sign),
     .if_inst(first_inst), // supposed to be mem_din (but it's only 1 byte)
     .id_pc(id_pc_i),
     .id_inst(id_inst_i)
@@ -167,6 +176,7 @@ module cpu(input wire clk_in,
     .id_alusel(id_alusel_o), .id_aluop(id_aluop_o),
     .id_imm(id_imm_o), .id_shamt(id_shamt_o),
     .id_link_addr(id_link_addr_o),
+    .stall(stall_sign),
     // data send to ex
     .ex_reg1(ex_reg1_i), .ex_reg2(ex_reg2_i),
     .ex_wd(ex_wd_i), .ex_wreg(ex_wreg_i),
@@ -193,6 +203,7 @@ module cpu(input wire clk_in,
     // input from ex
     .ex_wreg(ex_wreg_o), .ex_wdata(ex_wdata_o),
     .ex_rd(ex_wd_o),
+    .stall(stall_sign),
     // output to mem
     .mem_wdata(mem_wdata_i), .mem_wreg(mem_wreg_i),
     .mem_rd(mem_wd_i), .mem_addr(mem_addr_i),
@@ -220,6 +231,7 @@ module cpu(input wire clk_in,
     .rst(rst_in), .clk(clk_in),
     .mem_rd(mem_wd_o), .mem_wreg(mem_wreg_o),
     .mem_wdata(mem_wdata_o),
+    .stall(stall_sign),
     // output to wb (regfile)
     .wb_wreg(wb_wreg_i), .wb_wdata(wb_wdata_i),
     .wb_rd(wb_wd_i)
