@@ -151,7 +151,9 @@
 `define MemAddrBus 31:0 // the len of Rom address
 
 // --------------- macros related to register ----------------
+`define BlockNum  128 // InstCache Block
 `define RegAddrBus 4:0 // len of Regfile address
+`define MemDataBus 7:0  
 `define RegBus 31:0 // number of registers in Regfile
 `define RegWidth 32
 `define InstAddrWidth 32

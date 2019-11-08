@@ -10,11 +10,7 @@ module ram #(parameter ADDR_WIDTH = 17)
     
     wire       ram_bram_we;
     wire [7:0] ram_bram_dout;  // ???
-    wire[ADDR_WIDTH-1:0] a_in_1 = a_in;
-    wire[ADDR_WIDTH-1:0] a_in_2 = a_in + 8;
-    wire[ADDR_WIDTH-1:0] a_in_3 = a_in + 16;
-    wire[ADDR_WIDTH-1:0] a_in_4 = a_in + 24;
-    // NOTE: Could place 4 single_port_ram here
+    // NOTE: Cannot modify ports here
     single_port_ram_sync #(.ADDR_WIDTH(ADDR_WIDTH),
     .DATA_WIDTH(8)) ram_bram1(
     .clk(clk_in),
@@ -23,30 +19,7 @@ module ram #(parameter ADDR_WIDTH = 17)
     .din_a(d_in),
     .dout_a(ram_bram_dout)
     );
-    single_port_ram_sync #(.ADDR_WIDTH(ADDR_WIDTH),
-    .DATA_WIDTH(8)) ram_bram2(
-    .clk(clk_in),
-    .we(ram_bram_we),
-    .addr_a(a_in),
-    .din_a(d_in),
-    .dout_a(ram_bram_dout)
-    );
-    single_port_ram_sync #(.ADDR_WIDTH(ADDR_WIDTH),
-    .DATA_WIDTH(8)) ram_bram3(
-    .clk(clk_in),
-    .we(ram_bram_we),
-    .addr_a(a_in),
-    .din_a(d_in),
-    .dout_a(ram_bram_dout)
-    );
-    single_port_ram_sync #(.ADDR_WIDTH(ADDR_WIDTH),
-    .DATA_WIDTH(8)) ram_bram4(
-    .clk(clk_in),
-    .we(ram_bram_we),
-    .addr_a(a_in),
-    .din_a(d_in),
-    .dout_a(ram_bram_dout)
-    );
+    
     assign ram_bram_we = (en_in) ? ~r_nw_in      : 1'b0;
     assign d_out       = (en_in) ? ram_bram_dout : 8'h00;
     

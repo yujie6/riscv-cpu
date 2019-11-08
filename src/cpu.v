@@ -24,9 +24,18 @@ module cpu(input wire clk_in,
     // - 0x30000 write: write a byte to output (write 0x00 is ignored)
     // - 0x30004 read: read clocks passed since cpu starts (in dword, 4 bytes)
     // - 0x30004 write: indicates program stop (will output '\0' through uart tx)
+    
+    // MemController
+    wire if_mem_req;
+    wire mem_mem_req;
+    
+    
     wire [`InstBus] first_inst = {{12{1'b1}},{5'b00010},{3'b110},{5'b00100},{7'b0010011}};
     wire [`InstAddrBus] pc;
     wire [`InstAddrBus] id_pc_i;
+    wire [`InstBus] if_inst_o;
+    wire [`MemAddrBus] if_mem_addr;
+    wire if_write_enable;
     wire [`InstBus] id_inst_i;
     //assign id_inst_i = {first_inst};
     //assign mem_din   = first_inst;
@@ -71,11 +80,13 @@ module cpu(input wire clk_in,
     wire [`RegBus] mem_wdata_o;
     wire [`MemSelBus] mem_sel_o;
     wire [`MemAddrBus] mem_addr_o;
+    wire [`RegBus] mem_data_o;
     
     wire wb_wreg_i;
     wire [`RegAddrBus] wb_wd_i;
     wire [`RegBus] wb_wdata_i;
     
+    // regfile
     wire reg1_read;
     wire reg2_read;
     wire [`RegBus] reg1_data;
@@ -83,7 +94,18 @@ module cpu(input wire clk_in,
     wire [`RegAddrBus] reg1_addr;
     wire [`RegAddrBus] reg2_addr;
 
+    // stall controller 
     wire [5:0] stall_sign;
+    wire stallreq_mem;
+    
+    // Instruction cache
+    wire                    inst_cache_we;
+    wire[`InstAddrBus]      inst_cache_wpc;
+    wire[`InstBus]          inst_cache_winst;
+    wire[`InstAddrBus]      inst_cache_rpc;
+    wire                    inst_cache_hit;
+    wire[`InstBus]          inst_cache_inst;
+    
     
     always @(posedge clk_in)
     begin
@@ -110,23 +132,28 @@ module cpu(input wire clk_in,
     .mem_byte_i(mem_din),
     .we_byte_o(mem_dout),
     .byte_addr_o(mem_addr), // send to ram.v
-    .mem_data_o()
-    );
-
-    StallController StallController0(
-        .rst(rst_in),
-        .stall(stall_sign)
+    .mem_data_o(mem_data_o),
+    .if_mem_req_i(if_mem_req),
+    .mem_mem_req_i(mem_mem_req)
     );
     
-    pc_reg pc_reg0(
+    StallController StallController0(
+    .rst(rst_in),
+    .stall(stall_sign)
+    );
+    
+    IF if0(
     .clk(clk_in), .rst(rst_in),
     .pc(pc), .ce(rom_ce_o),
+    .mem_addr_o(if_mem_addr),
+    .mem_we_o(if_write_enable),
     .stall(stall_sign),
+    .inst_o(if_inst_o),
+    .if_mem_req_o(if_mem_req),
     .branch_flag_i(id_branch_flag_o),
     .branch_addr_i(id_branch_target_addr_o)
     );
     
-    assign mem_addr = pc;
     
     
     if_id if_id0(
@@ -216,11 +243,11 @@ module cpu(input wire clk_in,
     .wdata_i(mem_wdata_i), .rd_i(mem_wd_i),
     .aluop_i(mem_aluop_i),
     .mem_sel_o(mem_sel_o),
-    .mem_wdata_o(),
-    .mem_addr_o(),
-    .mem_we_o(),
-    .mem_ce_o(),
-    .mem_data_i(),
+    .mem_wdata_o(mem_wdata_o),
+    .mem_addr_o(mem_addr_o),
+    .mem_we_o(mem_we_o),
+    .mem_ce_o(1'b0),
+    .mem_data_i(mem_data_o),
     // output to mem_wb
     .wreg_o(mem_wreg_o), .wdata_o(mem_wdata_o),
     .rd_o(mem_wd_o)
