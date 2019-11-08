@@ -10,8 +10,8 @@ module StallController(
     input wire rst,
     input wire stallreq_ex,
     input wire stallreq_id,
-    input wire if_mem_req_i,
-    input wire mem_mem_req_i,
+    input wire stallreq_mem,
+    input wire stallreq_if,
     output reg [5:0] stall
 );
     // stall[0] -> stop PC
@@ -23,12 +23,14 @@ module StallController(
     always @(*) begin
         if (rst == `RstEnable) begin
             stall <= 6'b000000;
-        end else if (if_mem_req_i || mem_mem_req_i) begin 
+        end else if (stallreq_mem == `Stop) begin 
             stall <= 6'b011111; // [5:0]
         end else if (stallreq_ex == `Stop) begin
             stall <= 6'b001111;
         end else if (stallreq_id == `Stop) begin
             stall <= 6'b000111;
+        end else if (stallreq_if == `Stop) begin
+            stall <= 6'b000001;    
         end else begin
             stall <= 6'b000000;     
         end
