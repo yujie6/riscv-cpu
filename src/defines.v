@@ -145,7 +145,7 @@
 
 
 // -------------- macros related to rom ----------------------
-`define InstAddrBus 16:0
+`define InstAddrBus 31:0
 `define InstBus 31:0
 `define MemNum 130171 // the size of rom is 128km
 `define MemAddrBus 31:0 // the len of Rom address
