@@ -166,7 +166,7 @@ module cpu(input wire clk_in,
     if_id if_id0(
     .clk(clk_in), .rst(rst_in), .if_pc(pc),
     .stall(stall_sign),
-    .if_inst(first_inst), // supposed to be mem_din (but it's only 1 byte)
+    .if_inst(if_inst_o), // supposed to be mem_din (but it's only 1 byte)
     .id_pc(id_pc_i),
     .id_inst(id_inst_i)
     );

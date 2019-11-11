@@ -57,23 +57,27 @@ module IF(input wire clk,
                         mem_addr_o   <= pc;
                         stage        <= 4'b0001;
                         if_mem_req_o <= 1'b1;
+                        //$display("yes, send byte_addr_1");
                     end
                     4'b0001: begin
                         mem_addr_o   <= pc + 8;
                         stage        <= 4'b0010;
                         if_mem_req_o <= 1'b1;
+                        //$display("yes, send byte_addr_2");
                     end
                     4'b0010: begin
                         mem_addr_o   <= pc + 16;
                         stage        <= 4'b0011;
                         inst_block1  <= mem_byte_i;
                         if_mem_req_o <= 1'b1;
+                        //$display("yes, send byte_addr_3");
                     end
                     4'b0011: begin
                         mem_addr_o   <= pc + 24;
                         stage        <= 4'b0100;
                         inst_block2  <= mem_byte_i;
                         if_mem_req_o <= 1'b1;
+                        //$display("yes, send byte_addr_4");
                     end
                     4'b0100: begin
                         stage        <= 4'b0101;
@@ -84,6 +88,7 @@ module IF(input wire clk,
                         stage        <= 4'b0000;
                         inst_o       <= {mem_byte_i, inst_block3, inst_block2, inst_block1};
                         if_mem_req_o <= 1'b0;
+                        //$display("Inst fetch success!!");
                     end
                     default: ;
                 endcase
