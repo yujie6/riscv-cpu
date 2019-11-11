@@ -142,9 +142,7 @@ module riscv_top#(parameter SIM = 0)
     assign cpumc_a   = (hci_active) ? hci_ram_a:cpu_ram_a;
     assign cpumc_wr  = (hci_active) ? hci_ram_wr:cpu_ram_wr;
     assign cpumc_din = (hci_active) ? hci_ram_dout:cpu_ram_dout;
-    
-    //assign cpu_ram_din = (hci_io_en) ? hci_io_dout:ram_dout;
-    assign cpu_ram_din = ram_dout;
+    assign cpu_ram_din = (hci_io_en) ? hci_io_dout:ram_dout;
     assign hci_ram_din = ram_dout;
     
 endmodule

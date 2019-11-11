@@ -28,6 +28,7 @@ module cpu(input wire clk_in,
     // MemController
     wire if_mem_req;
     wire mem_mem_req;
+    wire [7:0] mem_byte_read;
     
     
     wire [`InstBus] first_inst = {{12{1'b1}},{5'b00010},{3'b110},{5'b00100},{7'b0010011}};
@@ -131,10 +132,10 @@ module cpu(input wire clk_in,
             .mem_write_enable_i(mem_we_o),
             .if_mem_addr_i(if_mem_addr),
             .mem_mem_addr_i(mem_mem_addr_o),
-            .mem_data_i(mem_dout),
+            .mem_data_i(mem_din),
             .write_enable_o(mem_wr),
             .mem_addr_o(mem_addr),
-            .mem_data_o(mem_din),
+            .mem_data_o(mem_byte_read),
             .if_stall_req_o(stallreq_if),
             .mem_stall_req_o(stallreq_mem)
     );
@@ -153,7 +154,7 @@ module cpu(input wire clk_in,
     .pc(pc), .ce(rom_ce_o),
     .mem_addr_o(if_mem_addr),
     .mem_we_o(if_write_enable),
-    .mem_byte_i(mem_dout),
+    .mem_byte_i(mem_byte_read),
     .stall(stall_sign),
     .inst_o(if_inst_o),
     .if_mem_req_o(if_mem_req),
