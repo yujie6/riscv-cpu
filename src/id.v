@@ -54,6 +54,10 @@ module id(input wire rst,
     {11{1'b0}}, inst_i[31], inst_i[19:12], inst_i[20],
     inst_i[30:21], 1'b0
     };
+    wire [`RegBus] sign_imm_b = {
+        {19{inst_i[31]}},
+    inst_i[31],inst_i[7],inst_i[30:25],inst_i[11:8], 1'b0
+    };
     
     
     reg instvalid;
@@ -139,7 +143,7 @@ module id(input wire rst,
                 // TODO: all compare are done here in ID
                 wreg_o      <= `WriteDisable;
                 rd_o        <= `NOPRegAddr;
-                imm_o       <= $signed(imm_b);
+                imm_o       <= sign_imm_b;
                 reg1_read_o <= `ReadEnable;
                 reg2_read_o <= `ReadEnable;
                 alusel_o    <= `EXE_RES_JUMP_BRANCH;
@@ -147,42 +151,42 @@ module id(input wire rst,
                     `EXE_BEQ: begin
                         aluop_o <= `EXE_BEQ_OP;
                         if (reg1_o == reg2_o) begin
-                            branch_target_addr_o <= pc_i + $signed(imm_b);
+                            branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
                     end
                     `EXE_BNE: begin
                         aluop_o <= `EXE_BNE_OP;
                         if (reg1_o != reg2_o) begin
-                            branch_target_addr_o <= pc_i + $signed(imm_b);
+                            branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
                     end
                     `EXE_BLT: begin
                         aluop_o <= `EXE_BLT_OP;
                         if ($signed(reg1_o) < $signed(reg2_o)) begin
-                            branch_target_addr_o <= pc_i + $signed(imm_b);
+                            branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
                     end
                     `EXE_BGE: begin
                         aluop_o <= `EXE_BGE_OP;
                         if ($signed(reg1_o) > $signed(reg2_o)) begin
-                            branch_target_addr_o <= pc_i + $signed(imm_b);
+                            branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
                     end
                     `EXE_BLTU: begin
                         aluop_o <= `EXE_BLTU_OP;
                         if (reg1_o < reg2_o) begin
-                            branch_target_addr_o <= pc_i + $signed(imm_b);
+                            branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
                     end
                     `EXE_BGEU: begin
                         aluop_o <= `EXE_BGEU_OP;
                         if (reg1_o == reg2_o) begin
-                            branch_target_addr_o <= pc_i + $signed(imm_b);
+                            branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
                     end
