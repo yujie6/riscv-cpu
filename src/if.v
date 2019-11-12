@@ -36,9 +36,10 @@ module IF(input wire clk,
             if_mem_req_o <= 1'b0;
             stage        <= 4'b0000;
             // TODO: Consider Jumping later
-            // end else if (branch_flag_i == 1'b1) begin
-            // pc    <= branch_addr_i;
-            // stage <= 4'b0000;
+            end else if (stall[0] == `NoStop && branch_flag_i == 1'b1) begin
+            pc    <= branch_addr_i;
+            stage <= 4'b0000;
+            if_mem_req_o <= 1'b1;
             end else if (stall[0] == `NoStop && if_mem_req_o == 1'b0 &&
             inst_o != `ZeroWord && first_fetch == 1'b0) begin
             pc           <= pc + 4'h4;

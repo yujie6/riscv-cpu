@@ -108,14 +108,16 @@ module id(input wire rst,
             
             `EXE_JAL: begin
                 // jump to imm_j and write pc+4 to rd
+                // FIXME: Need to rebuild
+                // FIXME: THe problem is when to change pc
                 aluop_o                 <= `EXE_JAL_OP;
                 alusel_o                <= `EXE_RES_JUMP_BRANCH;
                 wreg_o                  <= `WriteEnable;
-                imm_o                   <= imm_j;
+                imm_o                   <= $signed(imm_j);
                 rd_o                    <= rd;
                 link_addr_o             <= pc_4;
                 branch_flag_o           <= 1'b1;
-                branch_target_addr_o    <= imm_j;
+                branch_target_addr_o    <= pc_i + $signed(imm_j);
                 // branch_target_addr_o <= ;
             end
             
@@ -127,8 +129,9 @@ module id(input wire rst,
                 imm_o                <= imm_i;
                 rd_o                 <= rd;
                 reg1_read_o          <= `ReadEnable;
+                link_addr_o <= pc_4;
                 branch_flag_o        <= 1'b1;
-                branch_target_addr_o <= `ZeroWord;
+                branch_target_addr_o <= imm_i + reg1_o;
             end
             
             `EXE_BRANCH: begin
@@ -136,7 +139,7 @@ module id(input wire rst,
                 // TODO: all compare are done here in ID
                 wreg_o      <= `WriteDisable;
                 rd_o        <= `NOPRegAddr;
-                imm_o       <= imm_b;
+                imm_o       <= $signed(imm_b);
                 reg1_read_o <= `ReadEnable;
                 reg2_read_o <= `ReadEnable;
                 alusel_o    <= `EXE_RES_JUMP_BRANCH;

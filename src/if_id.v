@@ -12,10 +12,10 @@ module if_id(input wire clk,
         if (rst == `RstEnable) begin
             id_pc   <= `ZeroWord;
             id_inst <= `ZeroWord;
-            end else if (stall[1] == `Stop && stall[2] == `NoStop) begin
-            id_pc   <= `ZeroWord;
-            id_inst <= `ZeroWord;
-            end else if (stall[1] == `NoStop) begin
+            end else if (stall[0] == `Stop && stall[1] == `NoStop) begin
+            // id_pc   <= `ZeroWord;
+            // id_inst <= `ZeroWord;
+            end else if (stall[0] == `NoStop) begin
             id_pc   <= if_pc;
             id_inst <= if_inst;
         end
