@@ -18,10 +18,13 @@ module IF(input wire clk,
     reg [`MemDataBus] inst_block1;
     reg [`MemDataBus] inst_block2;
     reg [`MemDataBus] inst_block3;
+
+    reg first_fetch;
     
     always @(posedge clk) begin
         if (rst == `RstEnable) begin
             ce <= `ChipDisable;
+            first_fetch = 1'b1;
             end else begin
             ce <= `ChipEnable;
         end
@@ -32,11 +35,12 @@ module IF(input wire clk,
             pc           <= `ZeroWord;
             if_mem_req_o <= 1'b0;
             stage        <= 4'b0000;
-            end else if (branch_flag_i == 1'b1) begin
-            pc    <= branch_addr_i;
-            stage <= 4'b0000;
+            // TODO: Consider Jumping later
+            // end else if (branch_flag_i == 1'b1) begin
+            // pc    <= branch_addr_i;
+            // stage <= 4'b0000;
             end else if (stall[0] == `NoStop && if_mem_req_o == 1'b0 &&
-            inst_o != `ZeroWord) begin
+            inst_o != `ZeroWord && first_fetch == 1'b0) begin
             pc           <= pc + 4'h4;
             stage        <= 4'b0000;
             if_mem_req_o <= 1'b1;
@@ -51,7 +55,7 @@ module IF(input wire clk,
             mem_addr_o <= `ZeroWord;
             end else begin
             mem_we_o <= 1'b0;
-            if (if_mem_req_o == 1'b1 || pc == `ZeroWord) begin
+            if (if_mem_req_o == 1'b1 || first_fetch == 1'b1) begin
                 case (stage)
                     4'b0000: begin
                         mem_addr_o   <= pc;
@@ -60,34 +64,37 @@ module IF(input wire clk,
                         //$display("yes, send byte_addr_1");
                     end
                     4'b0001: begin
-                        mem_addr_o   <= pc + 8;
+                        mem_addr_o   <= pc + 1;
                         stage        <= 4'b0010;
                         if_mem_req_o <= 1'b1;
+                        inst_block1  <= mem_byte_i;
                         //$display("yes, send byte_addr_2");
                     end
                     4'b0010: begin
-                        mem_addr_o   <= pc + 16;
+                        mem_addr_o   <= pc + 2;
                         stage        <= 4'b0011;
-                        inst_block1  <= mem_byte_i;
                         if_mem_req_o <= 1'b1;
+                        inst_block1  <= mem_byte_i;
                         //$display("yes, send byte_addr_3");
                     end
                     4'b0011: begin
-                        mem_addr_o   <= pc + 24;
+                        mem_addr_o   <= pc + 3;
                         stage        <= 4'b0100;
-                        inst_block2  <= mem_byte_i;
                         if_mem_req_o <= 1'b1;
+                        inst_block2  <= mem_byte_i;
                         //$display("yes, send byte_addr_4");
                     end
                     4'b0100: begin
                         stage        <= 4'b0101;
-                        inst_block3  <= mem_byte_i;
                         if_mem_req_o <= 1'b1;
+                        inst_block3  <= mem_byte_i;
                     end
                     4'b0101: begin
                         stage        <= 4'b0000;
                         inst_o       <= {mem_byte_i, inst_block3, inst_block2, inst_block1};
+                        //inst_o       <= {inst_block1, inst_block2, inst_block3,mem_byte_i};
                         if_mem_req_o <= 1'b0;
+                        first_fetch  <= 1'b0;
                         //$display("Inst fetch success!!");
                     end
                     default: ;

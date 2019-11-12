@@ -72,7 +72,7 @@ module single_port_ram_sync#(parameter ADDR_WIDTH=6, parameter DATA_WIDTH=8)(
             q_addr_a <= addr_a;
         end
 
-    assign dout_a = ram[q_addr_a / 8];
+    assign dout_a = ram[q_addr_a];
 
 // initialize ram content (for simulation)
     integer i;
