@@ -1,5 +1,5 @@
 
-./test/expr.om：     文件格式 elf32-littleriscv
+./testdata/expr.om：     文件格式 elf32-littleriscv
 
 
 Disassembly of section .rom:

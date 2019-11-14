@@ -1,5 +1,5 @@
 
-./test/tak.om：     文件格式 elf32-littleriscv
+./testdata/tak.om：     文件格式 elf32-littleriscv
 
 
 Disassembly of section .rom:
