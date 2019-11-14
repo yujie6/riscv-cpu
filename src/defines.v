@@ -7,6 +7,8 @@
 `define Stop 1'b1 // for stall controller
 `define NoStop 1'b0 
 `define ZeroWord 32'h00000000 //32 bit 0 word
+`define ZeroHalf 16'h0000 
+`define ZeroByte 8'h00 
 `define WriteEnable 1'b1
 `define WriteDisable 1'b0
 `define AluOpBus 6:0

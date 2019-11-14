@@ -282,7 +282,7 @@ module cpu(input wire clk_in,
     .mem_data_i(mem_data_o),
     // output to mem_wb
     .wreg_o(mem_wreg_o), .wdata_o(mem_wdata_o),
-    .rd_o(mem_wd_o)
+    .rd_o(mem_wd_o), .stallreq_mem_o(stallreq_mem)
     );
     
     mem_wb mem_wb0(

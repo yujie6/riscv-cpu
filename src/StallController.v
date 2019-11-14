@@ -25,7 +25,7 @@ module StallController(
         if (rst == `RstEnable) begin
             stall <= 6'b000000;
         end else if (stallreq_mem == `Stop) begin 
-            stall <= 6'b011111; // [5:0]
+            stall <= 6'b001111; // [5:0]
         end else if (stallreq_branch == `Stop) begin
             stall <= 6'b100010;
         end 

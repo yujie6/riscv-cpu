@@ -115,6 +115,7 @@ module ex(input wire rst,
     always @(*) begin
         rd_o   <= rd_i;
         wreg_o <= wreg_i;
+        $display(aluop_i);
         case (alusel_i)
             `EXE_RES_LOGIC: wdata_o <= logic_out;
             `EXE_RES_ARITH: wdata_o <= arith_out;
