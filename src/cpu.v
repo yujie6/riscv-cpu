@@ -86,6 +86,7 @@ module cpu(input wire clk_in,
     wire [`MemSelBus] mem_sel_o;
     wire [`MemAddrBus] mem_mem_addr_o;
     wire [`RegBus] mem_data_o;
+    wire [7:0] mem_write_byte_o;
     
     wire wb_wreg_i;
     wire [`RegAddrBus] wb_wd_i;
@@ -131,15 +132,21 @@ module cpu(input wire clk_in,
     end
     
     MemController MemControl0(
+            .rst(rst_in),
             .if_mem_req_i(if_mem_req),
             .mem_mem_req_i(mem_mem_req),
             .mem_write_enable_i(mem_we_o),
+            // reciev mem_addr for reading
             .if_mem_addr_i(if_mem_addr),
             .mem_mem_addr_i(mem_mem_addr_o),
-            .mem_data_i(mem_din),
+            // write port & interact with ram.v
+            .mem_write_byte(mem_write_byte_o),
             .write_enable_o(mem_wr),
+            .mem_data_i(mem_din),
+            .mem_write(mem_dout),
             .mem_addr_o(mem_addr),
             .mem_data_o(mem_byte_read),
+            // send stall signal
             .if_stall_req_o(stallreq_if),
             .mem_stall_req_o(stallreq_mem)
     );
@@ -190,7 +197,7 @@ module cpu(input wire clk_in,
     .reg1_o(id_reg1_o), .reg2_o(id_reg2_o),
     .rd_o(id_wd_o), .wreg_o(id_wreg_o),
     .imm_o(id_imm_o), .shamt_o(id_shamt_o),
-    .pc_o(id_pc_o),
+    .pc_o(id_pc_o), .link_addr_o(id_link_addr_o),
     // data forwarding from ex
     .ex_wd_forward(ex_wd_o), .ex_wdata_forward(ex_wdata_o),
     .ex_wreg_forward(ex_wreg_o),
@@ -265,7 +272,7 @@ module cpu(input wire clk_in,
     .pc_i(mem_pc_i),
     .mem_addr_i(mem_addr_i),
     .mem_sel_o(mem_sel_o),
-    .mem_wdata_o(mem_wdata_o),
+    .mem_wdata_o(mem_write_byte_o),
     .mem_addr_o(mem_mem_addr_o),
     .mem_we_o(mem_we_o),
     .mem_ce_o(rom_ce_o),

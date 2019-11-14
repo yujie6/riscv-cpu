@@ -104,7 +104,7 @@ module id(input wire rst,
                 wreg_o  <= `WriteEnable;
                 imm_o   <= imm_u;
                 rd_o    <= rd;
-                $display("lui detected");
+                //$display("lui detected");
             end
             
             `EXE_AUIPC: begin

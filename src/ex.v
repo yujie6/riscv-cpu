@@ -75,16 +75,16 @@ module ex(input wire rst,
         if (rst == `RstEnable || alusel_i != `EXE_RES_ARITH) begin
             arith_out <= `ZeroWord;
             end else begin
-            $display("arith detected");
+            //$display("arith detected");
             case (aluop_i)
                 `EXE_ADD_OP:   arith_out  <= $signed(reg1_i) + $signed(reg2_i);
                 `EXE_ADDI_OP:  arith_out  <= $signed(reg1_i) + $signed(imm_i);
                 `EXE_SUB_OP:   arith_out  <= $signed(reg1_i) - $signed(reg2_i);
                 `EXE_SUBI_OP:   arith_out <= $signed(reg1_i) - $signed($signed(imm_i));
-                `EXE_AUIPC: arith_out <= pc_i + imm_i;
-                `EXE_LUI: begin 
+                `EXE_AUIPC_OP: arith_out <= pc_i + imm_i;
+                `EXE_LUI_OP: begin 
                     arith_out <= imm_i;
-                    $display("lui detected in ex");
+                    //$display("lui detected in ex");
                 end
                 // JAL and so on ...
                 default : begin
@@ -94,19 +94,19 @@ module ex(input wire rst,
         end
     end
 
-    always @(*) begin
-        if (rst == `RstEnable || alusel_i != `EXE_RES_JUMP_BRANCH) begin
-        end else begin
-            // NOTE: perhaps we can do something here....            
-        end
-    end
+    // always @(*) begin
+    //     if (rst == `RstEnable || alusel_i != `EXE_RES_JUMP_BRANCH) begin
+    //     end else begin
+    //         // NOTE: perhaps we can do something here....            
+    //     end
+    // end
     
     always @(*) begin
         if (rst == `RstEnable || alusel_i != `EXE_RES_LOAD_STORE) begin
             mem_out <= `ZeroWord;
         end
         else begin
-            mem_addr_o <= reg1_i + $signed(imm_i);
+            mem_out <= reg1_i + $signed(imm_i);
         end
     end
     
