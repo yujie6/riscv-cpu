@@ -60,6 +60,7 @@ module regfile(input wire clk,
     // ----------- wirte operation --------------
     always @(posedge clk) begin
         if (rst == `RstDisable) begin
+            $display("Answer is ", regs[1]);
             if ((we == `WriteEnable) && (waddr != `RegNumLog2'h0))
             begin
                 regs[waddr] <= wdata;

@@ -118,7 +118,7 @@ module id(input wire rst,
             
             `EXE_JAL: begin
                 // jump to imm_j and write pc+4 to rd
-                // FIXME: Continuous 2 jump inst, the second should not bt processed
+                // FIXME: Continuous 2 jump inst, the second should not be canceled
                 aluop_o                 <= `EXE_JAL_OP;
                 alusel_o                <= `EXE_RES_JUMP_BRANCH;
                 wreg_o                  <= `WriteEnable;
@@ -137,6 +137,10 @@ module id(input wire rst,
                 wreg_o               <= `WriteEnable;
                 imm_o                <= imm_i;
                 rd_o                 <= rd;
+                if (rd == 5'b00000 && rs1 == 5'b00001 && imm_i == `ZeroWord) begin
+                    $display("All process done");
+                    $finish;
+                end
                 reg1_read_o          <= `ReadEnable;
                 link_addr_o <= pc_4;
                 branch_flag_o        <= 1'b1;

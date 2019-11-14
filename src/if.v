@@ -12,6 +12,7 @@ module IF(input wire clk,
           output reg[`InstBus] inst_o,
           output reg mem_we_o,
           output reg if_mem_req_o,
+          output reg branch_cancel_req_o,
           output reg ce);
     
     reg [3:0] stage;
@@ -34,17 +35,20 @@ module IF(input wire clk,
         if (ce == `ChipDisable) begin
             pc           <= `ZeroWord;
             if_mem_req_o <= 1'b0;
+            branch_cancel_req_o <= 1'b0;
             stage        <= 4'b0000;
             // TODO: Consider Jumping later
             end else if (stall[0] == `NoStop && branch_flag_i == 1'b1) begin
             pc    <= branch_addr_i;
             stage <= 4'b0000;
+            branch_cancel_req_o <= 1'b1;
             if_mem_req_o <= 1'b1;
             end else if (stall[0] == `NoStop && if_mem_req_o == 1'b0 &&
             inst_o != `ZeroWord && first_fetch == 1'b0) begin
             pc           <= pc + 4'h4;
             stage        <= 4'b0000;
             if_mem_req_o <= 1'b1;
+            branch_cancel_req_o <= 1'b0;
         end
     end
     

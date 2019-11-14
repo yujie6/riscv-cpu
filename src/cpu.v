@@ -105,6 +105,7 @@ module cpu(input wire clk_in,
     wire stallreq_mem;
     wire stallreq_ex;
     wire stallreq_if;
+    wire branch_cancel_req;
     
     // Instruction cache
     wire                    inst_cache_we;
@@ -157,7 +158,8 @@ module cpu(input wire clk_in,
     .stallreq_mem(stallreq_mem),
     .stallreq_ex(stallreq_ex),
     .stallreq_id(stallreq_id),
-    .stallreq_if(stallreq_if)
+    .stallreq_if(stallreq_if),
+    .stallreq_branch(branch_cancel_req)
     );
     
     IF if0(
@@ -169,6 +171,7 @@ module cpu(input wire clk_in,
     .stall(stall_sign),
     .inst_o(if_inst_o),
     .if_mem_req_o(if_mem_req),
+    .branch_cancel_req_o(branch_cancel_req),
     .branch_flag_i(id_branch_flag_o),
     .branch_addr_i(id_branch_target_addr_o)
     );

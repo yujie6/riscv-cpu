@@ -12,6 +12,7 @@ module StallController(
     input wire stallreq_id,
     input wire stallreq_mem,
     input wire stallreq_if,
+    input wire stallreq_branch,
     output reg [5:0] stall
 );
     // stall[0] -> stop PC
@@ -25,9 +26,10 @@ module StallController(
             stall <= 6'b000000;
         end else if (stallreq_mem == `Stop) begin 
             stall <= 6'b011111; // [5:0]
-        end else if (stallreq_ex == `Stop) begin
-            stall <= 6'b001111;
-        end else if (stallreq_id == `Stop) begin
+        end else if (stallreq_branch == `Stop) begin
+            stall <= 6'b100010;
+        end 
+        else if (stallreq_id == `Stop) begin
             stall <= 6'b000111;
         end else if (stallreq_if == `Stop) begin
             stall <= 6'b000001;    
