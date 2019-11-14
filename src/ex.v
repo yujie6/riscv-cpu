@@ -75,6 +75,7 @@ module ex(input wire rst,
         if (rst == `RstEnable || alusel_i != `EXE_RES_ARITH) begin
             arith_out <= `ZeroWord;
             end else begin
+            $display("arith detected");
             case (aluop_i)
                 `EXE_ADD_OP:   arith_out  <= $signed(reg1_i) + $signed(reg2_i);
                 `EXE_ADDI_OP:  arith_out  <= $signed(reg1_i) + $signed(imm_i);
@@ -83,7 +84,7 @@ module ex(input wire rst,
                 `EXE_AUIPC: arith_out <= pc_i + imm_i;
                 `EXE_LUI: begin 
                     arith_out <= imm_i;
-                    $display("lui detected");
+                    $display("lui detected in ex");
                 end
                 // JAL and so on ...
                 default : begin

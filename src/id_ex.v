@@ -34,7 +34,7 @@ module id_ex(input wire clk,
             ex_shamt  <= 5'b00000;
             ex_wd     <= `NOPRegAddr;
             ex_wreg   <= `WriteDisable;
-            ex_link_addr <= {17{1'b0}};
+            ex_link_addr <= {32{1'b0}};
             end else if (stall[1] == `Stop && stall[2] == `NoStop) begin
             ex_aluop  <= `EXE_NOP_OP;
             ex_alusel <= `EXE_RES_NOP;
