@@ -22,6 +22,7 @@ module id(input wire rst,
           output reg [`RegBus] imm_o,                     // send imm to id_ex
           output reg [`RegAddrBus] shamt_o,
           output reg [`RegAddrBus] rd_o,
+          output wire [`InstAddrBus] pc_o,
           output reg [`InstAddrBus] branch_target_addr_o,
           output reg [`InstAddrBus] link_addr_o,
           output reg branch_flag_o,
@@ -36,6 +37,8 @@ module id(input wire rst,
     wire [`RegBus] pc_8;
     assign pc_4 = pc_i + 4;
     assign pc_8 = pc_i + 8;
+    assign pc_o = pc_i;
+
     // imm computing
     wire [`RegBus] imm_i = {
     {20{1'b0}}, inst_i[31:20]
@@ -51,7 +54,7 @@ module id(input wire rst,
     inst_i[31:12], {12{1'b0}}
     };
     wire [`RegBus] imm_j = {
-    {11{1'b0}}, inst_i[31], inst_i[19:12], inst_i[20],
+    {11{inst_i[31]}}, inst_i[31], inst_i[19:12], inst_i[20],
     inst_i[30:21], 1'b0
     };
     wire [`RegBus] sign_imm_b = {
@@ -97,6 +100,7 @@ module id(input wire rst,
             `EXE_LUI: begin
                 // Load immediate to rd
                 aluop_o <= `EXE_LUI_OP;
+                alusel_o <= `EXE_RES_ARITH;
                 wreg_o  <= `WriteEnable;
                 imm_o   <= imm_u;
                 rd_o    <= rd;
@@ -105,6 +109,7 @@ module id(input wire rst,
             `EXE_AUIPC: begin
                 // change pc to pc + imm
                 aluop_o <= `EXE_AUIPC_OP;
+                alusel_o <= `EXE_RES_ARITH;
                 wreg_o  <= `WriteEnable;
                 imm_o   <= imm_u;
                 rd_o    <= rd;
@@ -112,8 +117,7 @@ module id(input wire rst,
             
             `EXE_JAL: begin
                 // jump to imm_j and write pc+4 to rd
-                // FIXME: Need to rebuild
-                // FIXME: THe problem is when to change pc
+                // FIXME: Continuous 2 jump inst, the second should not bt processed
                 aluop_o                 <= `EXE_JAL_OP;
                 alusel_o                <= `EXE_RES_JUMP_BRANCH;
                 wreg_o                  <= `WriteEnable;

@@ -5,6 +5,7 @@ module ex(input wire rst,
           input wire [`AluSelBus] alusel_i,
           input wire [`RegBus] reg1_i,
           input wire [`RegBus] reg2_i,
+          input wire [`InstAddrBus] pc_i,
           input wire [`RegAddrBus] shamt_i,
           input wire [`RegBus] imm_i,
           input wire [`RegAddrBus] rd_i,
@@ -12,13 +13,16 @@ module ex(input wire rst,
           input wire wreg_i,
           output reg [`RegAddrBus] rd_o,
           output reg wreg_o,
+          output wire [`InstAddrBus] pc_o,
           output reg [`RegBus] wdata_o, // write to rd & data forwarding
           output reg [`MemAddrBus] mem_addr_o, // send to mem
           output wire [`AluOpBus] aluop_o, // send to MEM(for LD and SD)
           output wire [`RegBus] reg2_o); 
     assign aluop_o = aluop_i;
     assign reg2_o = reg2_i;
-    
+    assign pc_o = pc_i;    
+
+
     reg [`RegBus] logic_out;
     reg [`RegBus] shift_out;
     reg [`RegBus] arith_out;
@@ -76,6 +80,11 @@ module ex(input wire rst,
                 `EXE_ADDI_OP:  arith_out  <= $signed(reg1_i) + $signed(imm_i);
                 `EXE_SUB_OP:   arith_out  <= $signed(reg1_i) - $signed(reg2_i);
                 `EXE_SUBI_OP:   arith_out <= $signed(reg1_i) - $signed($signed(imm_i));
+                `EXE_AUIPC: arith_out <= pc_i + imm_i;
+                `EXE_LUI: begin 
+                    arith_out <= imm_i;
+                    $display("lui detected");
+                end
                 // JAL and so on ...
                 default : begin
                     arith_out <= `ZeroWord;
@@ -110,7 +119,7 @@ module ex(input wire rst,
             `EXE_RES_ARITH: wdata_o <= arith_out;
             `EXE_RES_SHIFT: wdata_o <= shift_out;
             `EXE_RES_LOAD_STORE: begin
-                wdata_o    <= 0;
+                wdata_o    <= `ZeroWord;
                 mem_addr_o <= mem_out;
             end
             `EXE_RES_JUMP_BRANCH: wdata_o <= link_addr_i;

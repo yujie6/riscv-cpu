@@ -48,10 +48,12 @@ module cpu(input wire clk_in,
     wire [`RegAddrBus] id_shamt_o;
     wire id_wreg_o;
     wire [`RegAddrBus] id_wd_o;
+    wire [`InstAddrBus] id_pc_o;
     wire [`MemAddrBus] id_branch_target_addr_o;
     wire id_branch_flag_o;
     wire [`MemAddrBus] id_link_addr_o;
     
+    wire [`InstAddrBus] ex_pc_i;
     wire [`AluOpBus] ex_aluop_i;
     wire [`MemAddrBus] ex_link_addr_i;
     wire [`AluSelBus] ex_alusel_i;
@@ -61,6 +63,7 @@ module cpu(input wire clk_in,
     wire [`RegBus] ex_imm_i;
     wire ex_wreg_i;
     wire [`RegAddrBus] ex_wd_i;
+    wire [`InstAddrBus] ex_pc_o;
     
     wire ex_wreg_o;
     wire [`RegAddrBus] ex_wd_o;
@@ -70,6 +73,7 @@ module cpu(input wire clk_in,
     wire [`MemAddrBus] ex_memaddr_o;
     
     wire mem_wreg_i;
+    wire [`InstAddrBus] mem_pc_i;
     wire [`RegAddrBus] mem_wd_i;
     wire [`RegBus] mem_wdata_i;
     wire [`AluOpBus] mem_aluop_i;
@@ -186,6 +190,7 @@ module cpu(input wire clk_in,
     .reg1_o(id_reg1_o), .reg2_o(id_reg2_o),
     .rd_o(id_wd_o), .wreg_o(id_wreg_o),
     .imm_o(id_imm_o), .shamt_o(id_shamt_o),
+    .pc_o(id_pc_o),
     // data forwarding from ex
     .ex_wd_forward(ex_wd_o), .ex_wdata_forward(ex_wdata_o),
     .ex_wreg_forward(ex_wreg_o),
@@ -211,10 +216,12 @@ module cpu(input wire clk_in,
     .id_alusel(id_alusel_o), .id_aluop(id_aluop_o),
     .id_imm(id_imm_o), .id_shamt(id_shamt_o),
     .id_link_addr(id_link_addr_o),
+    .id_pc(id_pc_o),
     .stall(stall_sign),
     // data send to ex
     .ex_reg1(ex_reg1_i), .ex_reg2(ex_reg2_i),
     .ex_wd(ex_wd_i), .ex_wreg(ex_wreg_i),
+    .ex_pc(ex_pc_i),
     .ex_aluop(ex_aluop_i), .ex_alusel(ex_alusel_i),
     .ex_imm(ex_imm_i), .ex_shamt(ex_shamt_i),
     .ex_link_addr(ex_link_addr_i)
@@ -227,10 +234,12 @@ module cpu(input wire clk_in,
     .aluop_i(ex_aluop_i), .alusel_i(ex_alusel_i),
     .wreg_i(ex_wreg_i), .imm_i(ex_imm_i),
     .shamt_i(ex_shamt_i),
+    .pc_i(ex_pc_i),
     .link_addr_i(ex_link_addr_i),
     // output to ex_mem
     .rd_o(ex_wd_o), .wdata_o(ex_wdata_o),
-    .wreg_o(ex_wreg_o), .mem_addr_o(ex_memaddr_o)
+    .wreg_o(ex_wreg_o), .mem_addr_o(ex_memaddr_o),
+    .pc_o(ex_pc_o)
     );
     
     ex_mem ex_mem0(
@@ -238,10 +247,12 @@ module cpu(input wire clk_in,
     // input from ex
     .ex_wreg(ex_wreg_o), .ex_wdata(ex_wdata_o),
     .ex_rd(ex_wd_o),
+    .ex_pc(ex_pc_o),
     .ex_memaddr(ex_memaddr_o),
     .stall(stall_sign),
     // output to mem
     .mem_wdata(mem_wdata_i), .mem_wreg(mem_wreg_i),
+    .mem_pc(mem_pc_i),
     .mem_rd(mem_wd_i), .mem_addr(mem_addr_i),
     .mem_aluop(mem_aluop_i)
     );
@@ -251,6 +262,7 @@ module cpu(input wire clk_in,
     .rst(rst_in), .wreg_i(mem_wreg_i),
     .wdata_i(mem_wdata_i), .rd_i(mem_wd_i),
     .aluop_i(mem_aluop_i),
+    .pc_i(mem_pc_i),
     .mem_addr_i(mem_addr_i),
     .mem_sel_o(mem_sel_o),
     .mem_wdata_o(mem_wdata_o),

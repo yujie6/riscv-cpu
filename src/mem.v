@@ -2,6 +2,7 @@
 module mem(input wire rst,
            input wire [`RegAddrBus] rd_i,
            input wire [`RegBus] wdata_i,
+           input wire [`InstAddrBus] pc_i,
            input wire wreg_i,
            input wire [`RegBus] mem_reg2_i,     // data from rs2
            input wire [`MemAddrBus] mem_addr_i,
