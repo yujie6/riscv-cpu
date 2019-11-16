@@ -5,6 +5,7 @@ module ex_mem(input wire clk,
               input wire [`RegAddrBus] ex_rd,
               input wire ex_wreg,
               input wire [`AluOpBus] ex_aluop,
+              input wire [`AluSelBus] ex_alusel,
               input wire [`RegBus] ex_reg2,
               input wire [`RegBus] ex_wdata,
               input wire [`MemAddrBus] ex_memaddr,
@@ -22,6 +23,7 @@ module ex_mem(input wire clk,
               output reg [`MemSelBus] mem_sel,
               output reg mem_we,
               output reg load_sign,
+              output reg [`AluSelBus] mem_alusel,
               output reg [`AluOpBus] mem_aluop);
     //assign mem_aluop = ex_aluop;
     
@@ -35,6 +37,7 @@ module ex_mem(input wire clk,
             mem_aluop <= `EXE_NOP_OP;
             mem_reg2 <= `ZeroWord;
             mem_sel <= `MEM_NOP;
+            mem_alusel <= `EXE_RES_NOP;
             end else if (stall[2] == `Stop && stall[3] == `NoStop) begin
             mem_rd    <= `NOPRegAddr;
             mem_wreg  <= `WriteDisable;
@@ -44,6 +47,7 @@ module ex_mem(input wire clk,
             mem_aluop <= `EXE_NOP_OP;
             mem_reg2 <= `ZeroWord;
             mem_sel <= `MEM_NOP;
+            mem_alusel <= `EXE_RES_NOP;
         end
         
         else if (stall[2] == `NoStop) begin
@@ -57,6 +61,7 @@ module ex_mem(input wire clk,
         mem_sel <= ex_mem_sel;
         mem_we <= ex_mem_we;
         load_sign <= ex_load_sign;
+        mem_alusel <= ex_alusel;
     end
     end
     

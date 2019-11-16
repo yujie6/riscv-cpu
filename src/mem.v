@@ -8,6 +8,7 @@ module mem(input wire rst,
            input wire [`MemAddrBus] mem_addr_i,
            input wire [`RegBus] mem_data_i,           // data read from memory
            input wire [`AluOpBus] aluop_i,
+           input wire [`AluSelBus] alusel_i,
            input wire [`MemSelBus] mem_sel_i,
            input wire mem_we_i,
            input wire mem_load_sign_i,

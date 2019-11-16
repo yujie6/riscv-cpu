@@ -20,6 +20,7 @@ module ex(input wire rst,
           output reg [`RegBus] wdata_o, // write to rd & data forwarding
           output reg [`MemAddrBus] mem_addr_o, // send to mem
           output wire [`AluOpBus] aluop_o, // send to MEM(for LD and SD)
+          output wire [`AluSelBus] alusel_o,
           output wire [`MemSelBus] mem_sel_o,
           output wire mem_we_o,
           output wire load_sign_o,
@@ -30,6 +31,7 @@ module ex(input wire rst,
     assign mem_sel_o = mem_sel_i;
     assign mem_we_o = mem_we_i;
     assign load_sign_o = load_sign_i;
+    assign alusel_o = alusel_i;
 
 
     reg [`RegBus] logic_out;

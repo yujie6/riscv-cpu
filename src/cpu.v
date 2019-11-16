@@ -186,16 +186,20 @@ module cpu(input wire clk_in,
     .id_inst(id_inst_i)
     );
 
-
+    // NOTE: Additional ports
     wire id_load_sign_o;
     wire [`MemSelBus] id_mem_sel_o;
     wire id_mem_we_o;
+
     wire ex_load_sign_i;
     wire [`MemSelBus] ex_mem_sel_i;
     wire ex_mem_we_i;
     wire ex_load_sign_o;
     wire [`MemSelBus] ex_mem_sel_o;
     wire ex_mem_we_o;
+    wire [`AluSelBus] ex_alusel_o;
+
+    wire [`AluSelBus] mem_alusel_i;
     wire mem_load_sign_i;
     wire [`MemSelBus] mem_sel_i;
     wire mem_we_i;
@@ -273,7 +277,8 @@ module cpu(input wire clk_in,
     .pc_o(ex_pc_o), .aluop_o(ex_aluop_o),
     .mem_sel_o(ex_mem_sel_o), .mem_we_o(ex_mem_we_o),
     .load_sign_o(ex_load_sign_o),
-    .reg2_o(ex_reg2_o)
+    .reg2_o(ex_reg2_o),
+    .alusel_o(ex_alusel_o)
     );
     
     ex_mem ex_mem0(
@@ -284,6 +289,7 @@ module cpu(input wire clk_in,
     .ex_pc(ex_pc_o),
     .ex_memaddr(ex_memaddr_o),
     .ex_aluop(ex_aluop_o),
+    .ex_alusel(ex_alusel_o),
     .ex_reg2(ex_reg2_o),
     .ex_mem_sel(ex_mem_sel_o),
     .ex_mem_we(ex_mem_we_o),
@@ -297,7 +303,7 @@ module cpu(input wire clk_in,
     .mem_rd(mem_wd_i), .mem_addr(mem_addr_i),
     .mem_sel(mem_sel_i), .mem_we(mem_we_i),
     .load_sign(mem_load_sign_i),
-    .mem_aluop(mem_aluop_i)
+    .mem_aluop(mem_aluop_i), .mem_alusel(mem_alusel_i)
     );
     // FIXME: PORTS CHECKING (NUMBER AND NAMES)
     mem mem0(
@@ -305,6 +311,7 @@ module cpu(input wire clk_in,
     .rst(rst_in), .wreg_i(mem_wreg_i),
     .wdata_i(mem_wdata_i), .rd_i(mem_wd_i),
     .aluop_i(mem_aluop_i),
+    .alusel_i(mem_alusel_i),
     .pc_i(mem_pc_i),
     .mem_addr_i(mem_addr_i),
     .mem_reg2_i(mem_reg2_i),
