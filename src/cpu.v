@@ -85,7 +85,6 @@ module cpu(input wire clk_in,
     wire [`RegBus] mem_wdata_o;
     wire [`MemSelBus] mem_sel_o;
     wire [`MemAddrBus] mem_mem_addr_o;
-    wire [`RegBus] mem_data_o;
     wire [7:0] mem_write_byte_o;
     
     wire wb_wreg_i;
@@ -308,6 +307,7 @@ module cpu(input wire clk_in,
     // FIXME: PORTS CHECKING (NUMBER AND NAMES)
     mem mem0(
     // input from ex_mem
+    .clk(clk_in),
     .rst(rst_in), .wreg_i(mem_wreg_i),
     .wdata_i(mem_wdata_i), .rd_i(mem_wd_i),
     .aluop_i(mem_aluop_i),
@@ -324,7 +324,7 @@ module cpu(input wire clk_in,
     .mem_addr_o(mem_mem_addr_o),
     .mem_we_o(mem_we_o),
     .mem_ce_o(rom_ce_o),
-    .mem_data_i(mem_data_o),
+    .mem_read_byte_i(mem_byte_read),
     // output to mem_wb
     .wreg_o(mem_wreg_o), .wdata_o(mem_wdata_o),
     .rd_o(mem_wd_o), .stallreq_mem_o(stallreq_mem)
