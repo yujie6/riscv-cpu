@@ -11,16 +11,25 @@ module ex(input wire rst,
           input wire [`RegAddrBus] rd_i,
           input wire [`MemAddrBus] link_addr_i, 
           input wire wreg_i,
+          input wire [`MemSelBus] mem_sel_i,
+          input wire mem_we_i,
+          input wire load_sign_i,
           output reg [`RegAddrBus] rd_o,
           output reg wreg_o,
           output wire [`InstAddrBus] pc_o,
           output reg [`RegBus] wdata_o, // write to rd & data forwarding
           output reg [`MemAddrBus] mem_addr_o, // send to mem
           output wire [`AluOpBus] aluop_o, // send to MEM(for LD and SD)
+          output wire [`MemSelBus] mem_sel_o,
+          output wire mem_we_o,
+          output wire load_sign_o,
           output wire [`RegBus] reg2_o); 
     assign aluop_o = aluop_i;
     assign reg2_o = reg2_i;
     assign pc_o = pc_i;    
+    assign mem_sel_o = mem_sel_i;
+    assign mem_we_o = mem_we_i;
+    assign load_sign_o = load_sign_i;
 
 
     reg [`RegBus] logic_out;
@@ -115,7 +124,6 @@ module ex(input wire rst,
     always @(*) begin
         rd_o   <= rd_i;
         wreg_o <= wreg_i;
-        $display(aluop_i);
         case (alusel_i)
             `EXE_RES_LOGIC: wdata_o <= logic_out;
             `EXE_RES_ARITH: wdata_o <= arith_out;

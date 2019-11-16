@@ -55,7 +55,7 @@ module IF(input wire clk,
     
     
     always @(posedge clk) begin
-        // TODO: Concatenate 4 bytes to a word make it inst
+        // FIXME: deal with the hazard between IF & MEM
         if (ce == `ChipDisable) begin
             mem_addr_o <= `ZeroWord;
             end else begin

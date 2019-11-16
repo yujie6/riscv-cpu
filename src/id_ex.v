@@ -13,6 +13,9 @@ module id_ex(input wire clk,
              input wire [`MemAddrBus] id_link_addr,
              input wire id_wreg,
              input wire [5:0] stall,
+             input wire id_load_sign,
+             input wire id_mem_we,
+             input wire [`MemSelBus] id_mem_sel,
              output reg [`AluOpBus] ex_aluop,
              output reg [`AluSelBus] ex_alusel,
              output reg [`RegBus] ex_reg1,
@@ -22,6 +25,9 @@ module id_ex(input wire clk,
              output reg [`RegBus] ex_imm,
              output reg [`RegAddrBus] ex_wd,
              output reg [`MemAddrBus] ex_link_addr,
+             output reg ex_load_sign,
+             output reg ex_mem_we,
+             output reg [`MemSelBus] ex_mem_sel,
              output reg ex_wreg);
     always @ (posedge clk) begin
         if (rst == `RstEnable) begin
@@ -35,6 +41,7 @@ module id_ex(input wire clk,
             ex_wd     <= `NOPRegAddr;
             ex_wreg   <= `WriteDisable;
             ex_link_addr <= {32{1'b0}};
+            ex_mem_sel <= `MEM_NOP;
             end else if ((stall[1] == `Stop && stall[2] == `NoStop) || stall[5]) begin
             ex_aluop  <= `EXE_NOP_OP;
             ex_alusel <= `EXE_RES_NOP;
@@ -45,8 +52,9 @@ module id_ex(input wire clk,
             ex_shamt  <= 5'b00000;
             ex_wd     <= `NOPRegAddr;
             ex_wreg   <= `WriteDisable;
-            ex_link_addr <= {17{1'b0}};
-            end if (stall[1] == `NoStop) begin
+            ex_link_addr <= {32{1'b0}};
+            ex_mem_sel <= `MEM_NOP;
+            end else if (stall[1] == `NoStop) begin
             ex_aluop  <= id_aluop;
             ex_alusel <= id_alusel;
             ex_reg1   <= id_reg1;
@@ -57,6 +65,9 @@ module id_ex(input wire clk,
             ex_pc <= id_pc;
             ex_wreg   <= id_wreg;
             ex_link_addr <= id_link_addr;
+            ex_mem_sel <= id_mem_sel;
+            ex_mem_we <= id_mem_we;
+            ex_load_sign <= id_load_sign;
         end
     end
     

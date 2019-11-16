@@ -25,6 +25,9 @@ module id(input wire rst,
           output wire [`InstAddrBus] pc_o,
           output reg [`InstAddrBus] branch_target_addr_o,
           output reg [`InstAddrBus] link_addr_o,
+          output reg [`MemSelBus] mem_sel_o,
+          output reg mem_we_o,
+          output reg mem_load_sign_o,
           output reg branch_flag_o,
           output reg wreg_o);
     wire [2:0] funct3      = inst_i[14:12];
@@ -214,21 +217,36 @@ module id(input wire rst,
                 case (funct3)
                     `EXE_LB: begin
                         aluop_o <= `EXE_LB_OP;
+                        mem_we_o <= `WriteDisable;
+                        mem_sel_o <= `MEM_BYTE;
+                        mem_load_sign_o <= 1'b1;
                     end
                     `EXE_LH: begin
                         aluop_o <= `EXE_LH_OP;
+                        mem_we_o <= `WriteDisable;
+                        mem_sel_o <= `MEM_HALF;
+                        mem_load_sign_o <= 1'b1;
                     end
                     `EXE_LW: begin
                         aluop_o <= `EXE_LW_OP;
+                        mem_we_o <= `WriteDisable;
+                        mem_sel_o <= `MEM_WORD;
+                        mem_load_sign_o <= 1'b1; 
                     end
                     `EXE_LBU: begin
                         aluop_o <= `EXE_LBU_OP;
+                        mem_we_o <= `WriteDisable;
+                        mem_sel_o <= `MEM_BYTE;
+                        mem_load_sign_o <= 1'b0;
                     end
                     `EXE_LHU: begin
                         aluop_o <= `EXE_LHU_OP;
+                        mem_we_o <= `WriteDisable;
+                        mem_sel_o <= `MEM_HALF;
+                        mem_load_sign_o <= 1'b0; 
                     end
                     default: begin
-                        
+                        aluop_o <= `EXE_NOP_OP;
                     end
                 endcase
             end
@@ -238,12 +256,27 @@ module id(input wire rst,
                 rd_o        <= `NOPRegAddr;
                 reg1_read_o <= `ReadEnable;
                 reg2_read_o <= `ReadEnable;
+                alusel_o    <= `EXE_RES_LOAD_STORE;
                 imm_o       <= imm_s;
                 case (funct3)
-                    `EXE_SB: ;
-                    `EXE_SH: ;
-                    `EXE_SW: ;
-                    default: ;
+                    `EXE_SB: begin
+                        aluop_o <= `EXE_SB_OP;
+                        mem_sel_o <= `MEM_BYTE;
+                        mem_we_o <= `WriteEnable;
+                    end
+                    `EXE_SH: begin
+                        aluop_o <= `EXE_SH_OP;
+                        mem_sel_o <= `MEM_HALF;
+                        mem_we_o <= `WriteEnable;
+                    end
+                    `EXE_SW: begin
+                        aluop_o <= `EXE_SW_OP;
+                        mem_sel_o <= `MEM_WORD;
+                        mem_we_o <= `WriteEnable;
+                    end
+                    default: begin
+                        aluop_o <= `EXE_NOP_OP;
+                    end
                 endcase
             end
             
@@ -251,7 +284,6 @@ module id(input wire rst,
                 wreg_o      <= `WriteEnable;
                 rd_o        <= rd;
                 reg1_read_o <= `ReadEnable;
-                // reg1_o <= reg1_data_i; NOTE: CANNOT PLACE HERE
                 imm_o <= imm_i;
                 case (funct3)
                     // TODO: where is SLTU
@@ -286,6 +318,7 @@ module id(input wire rst,
                         alusel_o <= `EXE_RES_LOGIC;
                     end
                     `EXE_SLLI: begin
+                    // FIXME: Modify alusel here 
                         // reg[rd] <= (reg[rs1] << shamt) also called shit amount
                         aluop_o <= `EXE_SLLI_OP;
                         shamt_o <= rs2;

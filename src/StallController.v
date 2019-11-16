@@ -27,7 +27,7 @@ module StallController(
         end else if (stallreq_mem == `Stop) begin 
             stall <= 6'b001111; // [5:0]
         end else if (stallreq_branch == `Stop) begin
-            stall <= 6'b100010;
+            stall <= 6'b100010; // cancel previous inst
         end 
         else if (stallreq_id == `Stop) begin
             stall <= 6'b000111;
