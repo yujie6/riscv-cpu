@@ -100,7 +100,7 @@ module cpu(input wire clk_in,
     wire [`RegAddrBus] reg2_addr;
 
     // stall controller 
-    wire [5:0] stall_sign;
+    wire [6:0] stall_sign;
     wire stallreq_mem;
     wire stallreq_ex;
     wire stallreq_if;

@@ -67,6 +67,7 @@ module single_port_ram_sync#(parameter ADDR_WIDTH=6, parameter DATA_WIDTH=8)(
 
     always @(posedge clk)
         begin
+            $display("Answer is", ram[40'h30004]);
             if (we)
                 ram[addr_a] <= din_a;
             q_addr_a <= addr_a;

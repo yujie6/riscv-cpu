@@ -4,7 +4,7 @@ module if_id(input wire clk,
              input wire rst,
              input wire[`InstAddrBus] if_pc,
              input wire[`InstBus] if_inst,
-             input wire[5:0] stall,
+             input wire[6:0] stall,
              output reg[`InstAddrBus] id_pc,
              output reg[`InstBus] id_inst);
     

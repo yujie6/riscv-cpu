@@ -95,6 +95,10 @@ module mem(input wire rst,
             end
         end
     end
+
+    always @(pc_i) begin
+        mem_done <= 1'b0;
+    end
     
     // There shall be some kind of delay
     always @(clk) begin
@@ -156,7 +160,7 @@ module mem(input wire rst,
             end else begin
             stage_write      <= {5{1'b0}};
             mem_write_byte_o <= `ZeroByte;
-            mem_done         <= 1'b0;
+            // mem_done         <= 1'b0;
             $display("mem_done is modyfied");
         end
     end

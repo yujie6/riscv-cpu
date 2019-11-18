@@ -5,7 +5,7 @@ module mem_wb(input wire clk,
               input wire [`RegAddrBus] mem_rd,
               input wire [`RegBus] mem_wdata,
               input wire mem_wreg,
-              input wire [5:0] stall,
+              input wire [6:0] stall,
               output reg [`RegAddrBus] wb_rd,
               output reg [`RegBus] wb_wdata,
               output reg wb_wreg);
