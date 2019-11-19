@@ -87,17 +87,27 @@ module mem(input wire rst,
         if (rst) begin
             stallreq_mem_o <= 1'b0;
             end else begin
-            if (mem_done) begin // || mem_read_done
-                stallreq_mem_o <= 1'b0;
-                end else if (!mem_done) begin
-                stallreq_mem_o <= 
-                alusel_i == `EXE_RES_LOAD_STORE;
+            if (mem_we_i) begin
+                if (mem_done) begin // || mem_read_done
+                    stallreq_mem_o <= 1'b0;
+                end else begin
+                    stallreq_mem_o <= 
+                    alusel_i == `EXE_RES_LOAD_STORE;
+                end
+            end else begin
+                if (mem_read_done) begin
+                    stallreq_mem_o <= 1'b0;
+                end else begin
+                    stallreq_mem_o <= 
+                    alusel_i == `EXE_RES_LOAD_STORE;
+                end
             end
         end
     end
-
+    
     always @(pc_i) begin
         mem_done <= 1'b0;
+        mem_read_done <= 1'b0;
     end
     
     // There shall be some kind of delay
@@ -160,11 +170,11 @@ module mem(input wire rst,
             end else begin
             stage_write      <= {5{1'b0}};
             mem_write_byte_o <= `ZeroByte;
-            // mem_done         <= 1'b0;
+            // mem_done      <= 1'b0;
             //$display("mem_done is modyfied");
         end
     end
-
+    
     reg mem_read_done;
     reg [4:0] stage_read;
     reg [`MemDataBus] byte_read_1;
@@ -173,57 +183,58 @@ module mem(input wire rst,
     reg [`MemDataBus] byte_read_4;
     
     always @(clk) begin
-        if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0) begin
+        if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
             mem_we_o  <= `WriteDisable;
             mem_sel_o <= mem_sel_i;
-            $display("load start");
+            $display("load start", mem_addr_i);
+            // load takes 2 cycle
             case (stage_read)
                 5'b00000: begin
                     mem_addr_o <= byte_addr_1;
                     stage_read <= 5'b00001;
                 end
                 5'b00001: begin
-                    mem_addr_o  <= byte_addr_2;
+                    mem_addr_o <= byte_addr_2;
+                    stage_read <= 5'b00010;
+                end
+                5'b00010: begin
+                    mem_addr_o  <= byte_addr_3;
                     byte_read_1 <= mem_read_byte_i;
                     if (mem_sel_o == `MEM_BYTE) begin
-                        mem_read_done   <= 1'b1;
-                        stage_read <= 5'b00000;
-                        end else begin
-                            stage_read <= 5'b00010;
-                        end
+                        mem_read_done <= 1'b1;
+                        stage_read    <= 5'b00000;
                     end
-                    5'b00010: begin
-                        mem_addr_o  <= byte_addr_3;
-                        byte_read_2 <= mem_read_byte_i;
-                        if (mem_sel_o == `MEM_HALF) begin
-                            mem_read_done   <= 1'b1;
-                            stage_read <= 5'b00000;
-                            end else begin
-                                stage_read <= 5'b00011;
-                            end
-                        end
-                        5'b00011: begin
-                            mem_addr_o  <= byte_addr_4;
-                            byte_read_3 <= mem_read_byte_i;
-                            stage_read  <= 5'b00100;
-                        end
-                        5'b00100: begin
-                            mem_addr_o  <= `ZeroWord;
-                            byte_read_4 <= mem_read_byte_i;
-                            if (mem_sel_o <= `MEM_WORD) begin
-                                mem_read_done   <= 1'b1;
-                                stage_read <= 5'b00000;
-                            end
-                        end
-                        default: ;
+                    else begin
+                        stage_read <= 5'b00011;
+                    end
+                end
+                5'b00011: begin
+                    mem_addr_o  <= byte_addr_4;
+                    byte_read_2 <= mem_read_byte_i;
+                    if (mem_sel_o == `MEM_HALF) begin
+                        mem_read_done <= 1'b1;
+                        stage_read    <= 5'b00000;
+                    end
+                    stage_read <= 5'b00100;
+                end
+                5'b00100: begin
+                    byte_read_3 <= mem_read_byte_i;
+                    stage_read  <= 5'b00101;
+                end
+                5'b00101: begin
+                    byte_read_4   <= mem_read_byte_i;
+                    mem_read_done <= 1'b1;
+                    stage_read    <= 5'b00000;
+                end
+                default: ;
             endcase
             end else begin
-            stage_read  <= {5{1'b0}};
-            mem_read_done    <= 1'b0;
-            byte_read_1 <= `ZeroByte;
-            byte_read_2 <= `ZeroByte;
-            byte_read_3 <= `ZeroByte;
-            byte_read_4 <= `ZeroByte;
+            stage_read    <= {5{1'b0}};
+            // mem_read_done <= 1'b0;
+            // byte_read_1   <= `ZeroByte;
+            // byte_read_2   <= `ZeroByte;
+            // byte_read_3   <= `ZeroByte;
+            // byte_read_4   <= `ZeroByte;
         end
     end
     
