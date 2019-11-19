@@ -68,7 +68,7 @@ module regfile(input wire clk,
     end
     // ------------ read operation ---------------
     always @(*) begin
-        if (rst == `RstEnable || raddr2 == `RegNumLog2'h0) begin
+        if (rst == `RstEnable || raddr1 == `RegNumLog2'h0) begin
             // Knowing that register 0 is always ZEROWORD
             rdata1 <= `ZeroWord;
             end else if ((raddr1 == waddr) && (we == `WriteEnable) &&
@@ -76,6 +76,8 @@ module regfile(input wire clk,
             rdata1 <= wdata;
             end else if (re1 == `ReadEnable) begin
             rdata1 <= regs[raddr1];
+            //$display("The addr of reg1 ", raddr1);
+            //$display("The data of reg1 ", regs[raddr1]);
             end else begin
             rdata1 <= `ZeroWord;
         end

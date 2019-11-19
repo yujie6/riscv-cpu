@@ -110,14 +110,14 @@ module mem(input wire rst,
                     mem_addr_o       <= byte_addr_1;
                     mem_write_byte_o <= byte_write_1;
                     stage_write      <= 5'b00001;
-                    $display("mem store start!");
+                    //$display("mem store start!");
                 end
                 5'b00001: begin
                     if (mem_sel_o == `MEM_BYTE) begin
                         mem_done    <= 1'b1;
                         stage_write <= 5'b00000;
                         mem_we_o    <= `WriteDisable;
-                        $display("mem done");
+                        //$display("mem done");
                     end
                     else begin
                         mem_addr_o       <= byte_addr_2;
@@ -161,7 +161,7 @@ module mem(input wire rst,
             stage_write      <= {5{1'b0}};
             mem_write_byte_o <= `ZeroByte;
             // mem_done         <= 1'b0;
-            $display("mem_done is modyfied");
+            //$display("mem_done is modyfied");
         end
     end
 

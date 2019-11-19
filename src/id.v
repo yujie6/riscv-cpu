@@ -141,8 +141,8 @@ module id(input wire rst,
                 imm_o                <= imm_i;
                 rd_o                 <= rd;
                 if (rd == 5'b00000 && rs1 == 5'b00001 && imm_i == `ZeroWord) begin
-                    $display("All process done");
-                    $finish;
+                    $display("All process done, now ret");
+                    //$finish;
                 end
                 reg1_read_o          <= `ReadEnable;
                 link_addr_o <= pc_4;
