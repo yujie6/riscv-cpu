@@ -5,11 +5,12 @@
 Disassembly of section .rom:
 
 00000000 <.rom>:
-   0:	00020137          	lui	sp,0x20
+   0:	00020137          	lui	sp,0x20 // sp=0x20000
    4:	054010ef          	jal	ra,1058 <main>
-   8:	0ff00513          	li	a0,255
-   c:	000306b7          	lui	a3,0x30
+   8:	0ff00513          	li	a0,255 // reg[10] = 255 = 0xff
+   c:	000306b7          	lui	a3,0x30 // reg[13] = 0x30000
   10:	00a68223          	sb	a0,4(a3) # 30004 <__heap_start+0x2e004>
+					// mem[0x30004] = reg[10] = 255
   14:	ff9ff06f          	j	c <a-0xff4>
 
 Disassembly of section .text:
@@ -41,21 +42,23 @@ Disassembly of section .text:
 Disassembly of section .text.startup:
 
 00001058 <main>:
-    1058:	000037b7          	lui	a5,0x3
-    105c:	ff010113          	addi	sp,sp,-16
+    1058:	000037b7          	lui	a5,0x3 // a5 = 0x3000
+    105c:	ff010113          	addi	sp,sp,-16 // sp=sp-16 = 0x20000-0x10
     1060:	23078793          	addi	a5,a5,560 # 3230 <__heap_start+0x1230>
-    1064:	00f11223          	sh	a5,4(sp)
-    1068:	03100713          	li	a4,49
-    106c:	000307b7          	lui	a5,0x30
+						// a5 = 0x3230
+    1064:	00f11223          	sh	a5,4(sp) //mem[sp+4]=0x30 [sp+5]=0x32
+    1068:	03100713          	li	a4,49 // a4 = 49 = 0x31
+    106c:	000307b7          	lui	a5,0x30 // a5 = 0x30000
     1070:	00e78023          	sb	a4,0(a5) # 30000 <__heap_start+0x2e000>
-    1074:	00514703          	lbu	a4,5(sp)
-    1078:	00000513          	li	a0,0
-    107c:	00e78023          	sb	a4,0(a5)
-    1080:	00414703          	lbu	a4,4(sp)
-    1084:	00e78023          	sb	a4,0(a5)
-    1088:	00a00713          	li	a4,10
-    108c:	00e78023          	sb	a4,0(a5)
-    1090:	01010113          	addi	sp,sp,16
+    						// mem[0x30000] = 49 = 0x31 ~ 1
+    1074:	00514703          	lbu	a4,5(sp) // a4 = 0x32
+    1078:	00000513          	li	a0,0 // a0 = 0
+    107c:	00e78023          	sb	a4,0(a5) // mem[0x30000] = 0x32 ~ 2
+    1080:	00414703          	lbu	a4,4(sp) // a4 = 0x30
+    1084:	00e78023          	sb	a4,0(a5) // mem[0x30000] = 0x30 ~ 0
+    1088:	00a00713          	li	a4,10   // a4 = 10 = 0xa
+    108c:	00e78023          	sb	a4,0(a5) // mem[0x30000] = 0xa ~ \n
+    1090:	01010113          	addi	sp,sp,16 // sp = sp+16 = 0x20000
     1094:	00008067          	ret
 
 Disassembly of section .riscv.attributes:

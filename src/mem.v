@@ -111,7 +111,7 @@ module mem(input wire rst,
     end
     
     // There shall be some kind of delay
-    always @(clk) begin
+    always @(posedge clk) begin
         if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b1) begin
             mem_we_o  <= `WriteEnable;
             mem_sel_o <= mem_sel_i;
@@ -127,6 +127,8 @@ module mem(input wire rst,
                         mem_done    <= 1'b1;
                         stage_write <= 5'b00000;
                         mem_we_o    <= `WriteDisable;
+                        // NOTE: Remember to reset mem_addr_o, or the hci cannot stop
+                        mem_addr_o <= `ZeroWord;
                         //$display("mem done");
                     end
                     else begin
@@ -143,6 +145,7 @@ module mem(input wire rst,
                         mem_done    <= 1'b1;
                         stage_write <= 5'b00000;
                         mem_we_o    <= `WriteDisable;
+                        mem_addr_o <= `ZeroWord;
                     end
                     else begin
                         stage_write <= 5'b00010;
@@ -158,6 +161,7 @@ module mem(input wire rst,
                         mem_done    <= 1'b1;
                         stage_write <= 5'b00000;
                         mem_we_o    <= `WriteDisable;
+                        mem_addr_o <= `ZeroWord;
                     end
                     else begin
                         stage_write <= 5'b00101;
@@ -170,6 +174,7 @@ module mem(input wire rst,
             end else begin
             stage_write      <= {5{1'b0}};
             mem_write_byte_o <= `ZeroByte;
+            // mem_addr_o <= `ZeroWord;
             // mem_done      <= 1'b0;
             //$display("mem_done is modyfied");
         end
@@ -182,7 +187,7 @@ module mem(input wire rst,
     reg [`MemDataBus] byte_read_3;
     reg [`MemDataBus] byte_read_4;
     
-    always @(clk) begin
+    always @(posedge clk) begin
         if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
             mem_we_o  <= `WriteDisable;
             mem_sel_o <= mem_sel_i;
@@ -203,6 +208,7 @@ module mem(input wire rst,
                     if (mem_sel_o == `MEM_BYTE) begin
                         mem_read_done <= 1'b1;
                         stage_read    <= 5'b00000;
+                        mem_addr_o <= `ZeroWord;
                     end
                     else begin
                         stage_read <= 5'b00011;
@@ -214,6 +220,7 @@ module mem(input wire rst,
                     if (mem_sel_o == `MEM_HALF) begin
                         mem_read_done <= 1'b1;
                         stage_read    <= 5'b00000;
+                        mem_addr_o <= `ZeroWord;
                     end
                     stage_read <= 5'b00100;
                 end
@@ -225,11 +232,13 @@ module mem(input wire rst,
                     byte_read_4   <= mem_read_byte_i;
                     mem_read_done <= 1'b1;
                     stage_read    <= 5'b00000;
+                    mem_addr_o <= `ZeroWord;
                 end
                 default: ;
             endcase
             end else begin
             stage_read    <= {5{1'b0}};
+            // mem_addr_o <= `ZeroWord;
             // mem_read_done <= 1'b0;
             // byte_read_1   <= `ZeroByte;
             // byte_read_2   <= `ZeroByte;

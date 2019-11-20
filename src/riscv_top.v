@@ -124,7 +124,7 @@ module riscv_top#(parameter SIM = 0)
     );
     
     assign hci_io_sel = cpumc_a[2:0];
-    assign hci_io_en  = (cpumc_a[RAM_ADDR_WIDTH:RAM_ADDR_WIDTH-1] == 2'b11) ? 1'b1:1'b0;
+    assign hci_io_en  = (cpumc_a[RAM_ADDR_WIDTH:RAM_ADDR_WIDTH-1] == 2'b11) ? 1'b1:1'b0; // if the addr is 0x30000
     assign hci_io_wr  = cpumc_wr;
     assign hci_io_din = cpumc_din;
     
