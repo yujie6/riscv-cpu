@@ -87,6 +87,7 @@ module cpu(input wire clk_in,
     wire [`MemAddrBus] mem_mem_addr_o;
     wire [7:0] mem_write_byte_o;
     
+    wire [`InstAddrBus] wb_pc_i;
     wire wb_wreg_i;
     wire [`RegAddrBus] wb_wd_i;
     wire [`RegBus] wb_wdata_i;
@@ -313,6 +314,7 @@ module cpu(input wire clk_in,
     .aluop_i(mem_aluop_i),
     .alusel_i(mem_alusel_i),
     .pc_i(mem_pc_i),
+    .pc_o(wb_pc_i),
     .mem_addr_i(mem_addr_i),
     .mem_reg2_i(mem_reg2_i),
     .mem_we_i(mem_we_i),
@@ -338,6 +340,7 @@ module cpu(input wire clk_in,
     .mem_rd(mem_wd_o), .mem_wreg(mem_wreg_o),
     .mem_wdata(mem_wdata_o),
     .stall(stall_sign),
+    .wb_pc_i(wb_pc_i),
     // output to wb (regfile)
     .wb_wreg(wb_wreg_i), .wb_wdata(wb_wdata_i),
     .wb_rd(wb_wd_i)

@@ -41,10 +41,13 @@ module id(input wire rst,
     assign pc_4 = pc_i + 4;
     assign pc_8 = pc_i + 8;
     assign pc_o = pc_i;
-
+    
     // imm computing
     wire [`RegBus] imm_i = {
     {20{1'b0}}, inst_i[31:20]
+    };
+    wire [`RegBus] sign_imm_i = {
+    {20{inst_i[31]}}, inst_i[31:20]
     };
     wire [`RegBus] imm_b = {
     {19{1'b0}},
@@ -61,7 +64,7 @@ module id(input wire rst,
     inst_i[30:21], 1'b0
     };
     wire [`RegBus] sign_imm_b = {
-        {19{inst_i[31]}},
+    {19{inst_i[31]}},
     inst_i[31],inst_i[7],inst_i[30:25],inst_i[11:8], 1'b0
     };
     
@@ -102,21 +105,21 @@ module id(input wire rst,
         case (opcode)
             `EXE_LUI: begin
                 // Load immediate to rd
-                aluop_o <= `EXE_LUI_OP;
+                aluop_o  <= `EXE_LUI_OP;
                 alusel_o <= `EXE_RES_ARITH;
-                wreg_o  <= `WriteEnable;
-                imm_o   <= imm_u;
-                rd_o    <= rd;
+                wreg_o   <= `WriteEnable;
+                imm_o    <= imm_u;
+                rd_o     <= rd;
                 //$display("lui detected");
             end
             
             `EXE_AUIPC: begin
                 // change pc to pc + imm
-                aluop_o <= `EXE_AUIPC_OP;
+                aluop_o  <= `EXE_AUIPC_OP;
                 alusel_o <= `EXE_RES_ARITH;
-                wreg_o  <= `WriteEnable;
-                imm_o   <= imm_u;
-                rd_o    <= rd;
+                wreg_o   <= `WriteEnable;
+                imm_o    <= imm_u;
+                rd_o     <= rd;
             end
             
             `EXE_JAL: begin
@@ -135,17 +138,17 @@ module id(input wire rst,
             
             `EXE_JALR: begin
                 // jump to reg[rs1] + imm_i
-                aluop_o              <= `EXE_JALR_OP;
-                alusel_o             <= `EXE_RES_JUMP_BRANCH;
-                wreg_o               <= `WriteEnable;
-                imm_o                <= imm_i;
-                rd_o                 <= rd;
+                aluop_o  <= `EXE_JALR_OP;
+                alusel_o <= `EXE_RES_JUMP_BRANCH;
+                wreg_o   <= `WriteEnable;
+                imm_o    <= imm_i;
+                rd_o     <= rd;
                 if (rd == 5'b00000 && rs1 == 5'b00001 && imm_i == `ZeroWord) begin
                     $display("All process done, now ret");
                     //$finish;
                 end
                 reg1_read_o          <= `ReadEnable;
-                link_addr_o <= pc_4;
+                link_addr_o          <= pc_4;
                 branch_flag_o        <= 1'b1;
                 branch_target_addr_o <= imm_i + reg1_o;
             end
@@ -216,34 +219,34 @@ module id(input wire rst,
                 imm_o       <= imm_i;
                 case (funct3)
                     `EXE_LB: begin
-                        aluop_o <= `EXE_LB_OP;
-                        mem_we_o <= `WriteDisable;
-                        mem_sel_o <= `MEM_BYTE;
+                        aluop_o         <= `EXE_LB_OP;
+                        mem_we_o        <= `WriteDisable;
+                        mem_sel_o       <= `MEM_BYTE;
                         mem_load_sign_o <= 1'b1;
                     end
                     `EXE_LH: begin
-                        aluop_o <= `EXE_LH_OP;
-                        mem_we_o <= `WriteDisable;
-                        mem_sel_o <= `MEM_HALF;
+                        aluop_o         <= `EXE_LH_OP;
+                        mem_we_o        <= `WriteDisable;
+                        mem_sel_o       <= `MEM_HALF;
                         mem_load_sign_o <= 1'b1;
                     end
                     `EXE_LW: begin
-                        aluop_o <= `EXE_LW_OP;
-                        mem_we_o <= `WriteDisable;
-                        mem_sel_o <= `MEM_WORD;
-                        mem_load_sign_o <= 1'b1; 
+                        aluop_o         <= `EXE_LW_OP;
+                        mem_we_o        <= `WriteDisable;
+                        mem_sel_o       <= `MEM_WORD;
+                        mem_load_sign_o <= 1'b1;
                     end
                     `EXE_LBU: begin
-                        aluop_o <= `EXE_LBU_OP;
-                        mem_we_o <= `WriteDisable;
-                        mem_sel_o <= `MEM_BYTE;
+                        aluop_o         <= `EXE_LBU_OP;
+                        mem_we_o        <= `WriteDisable;
+                        mem_sel_o       <= `MEM_BYTE;
                         mem_load_sign_o <= 1'b0;
                     end
                     `EXE_LHU: begin
-                        aluop_o <= `EXE_LHU_OP;
-                        mem_we_o <= `WriteDisable;
-                        mem_sel_o <= `MEM_HALF;
-                        mem_load_sign_o <= 1'b0; 
+                        aluop_o         <= `EXE_LHU_OP;
+                        mem_we_o        <= `WriteDisable;
+                        mem_sel_o       <= `MEM_HALF;
+                        mem_load_sign_o <= 1'b0;
                     end
                     default: begin
                         aluop_o <= `EXE_NOP_OP;
@@ -260,19 +263,19 @@ module id(input wire rst,
                 imm_o       <= imm_s;
                 case (funct3)
                     `EXE_SB: begin
-                        aluop_o <= `EXE_SB_OP;
+                        aluop_o   <= `EXE_SB_OP;
                         mem_sel_o <= `MEM_BYTE;
-                        mem_we_o <= `WriteEnable;
+                        mem_we_o  <= `WriteEnable;
                     end
                     `EXE_SH: begin
-                        aluop_o <= `EXE_SH_OP;
+                        aluop_o   <= `EXE_SH_OP;
                         mem_sel_o <= `MEM_HALF;
-                        mem_we_o <= `WriteEnable;
+                        mem_we_o  <= `WriteEnable;
                     end
                     `EXE_SW: begin
-                        aluop_o <= `EXE_SW_OP;
+                        aluop_o   <= `EXE_SW_OP;
                         mem_sel_o <= `MEM_WORD;
-                        mem_we_o <= `WriteEnable;
+                        mem_we_o  <= `WriteEnable;
                     end
                     default: begin
                         aluop_o <= `EXE_NOP_OP;
@@ -281,16 +284,18 @@ module id(input wire rst,
             end
             
             `EXE_ALU_IMM: begin
+            // FIXME: The problem is that rd = rs1;
                 wreg_o      <= `WriteEnable;
                 rd_o        <= rd;
                 reg1_read_o <= `ReadEnable;
-                imm_o <= imm_i;
+                imm_o       <= sign_imm_i;
                 case (funct3)
                     // TODO: where is SLTU
                     `EXE_ADDI: begin
                         // 12-bit imm sign extended, then reg[rd] <= imm + reg[rs1]
                         aluop_o  <= `EXE_ADDI_OP;
                         alusel_o <= `EXE_RES_ARITH;
+                        reg2_read_o <= `ReadDisable;
                     end
                     `EXE_SLTI: begin
                         // imm sign extended & rs1 as signed 32-bit
@@ -318,7 +323,7 @@ module id(input wire rst,
                         alusel_o <= `EXE_RES_LOGIC;
                     end
                     `EXE_SLLI: begin
-                    // FIXME: Modify alusel here 
+                        // FIXME: Modify alusel here
                         // reg[rd] <= (reg[rs1] << shamt) also called shit amount
                         aluop_o <= `EXE_SLLI_OP;
                         shamt_o <= rs2;
@@ -406,6 +411,8 @@ module id(input wire rst,
     end
     end
     
+
+    // FIXME: The main problem is data hazard now !!!
     always @(*) begin
         if (rst == `RstEnable) begin
             reg1_o <= `ZeroWord;
@@ -414,16 +421,19 @@ module id(input wire rst,
             && (ex_wd_forward == reg1_addr_o)) begin
             // NOTE: Date forwarding from ex
             reg1_o <= ex_wdata_forward;
-            end else if ((reg1_read_o == `ReadEnable) && (mem_wreg_forward == `WriteEnable)
-            && (mem_wd_forward == reg1_addr_o)) begin
+            end
+        else if ((reg1_read_o == `ReadEnable) && (mem_wreg_forward == `WriteEnable)
+            && (mem_wd_forward == reg1_addr_o))
+            begin
             // NOTE: Data forwarding from mem
             reg1_o <= mem_wdata_forward;
             end
         else if (reg1_read_o == `ReadEnable) begin
             reg1_o <= reg1_data_i; // read from regfile port 1
-            end else if (reg1_read_o == `ReadDisable) begin
-            reg1_o <= `ZeroWord;
         end
+            else if (reg1_read_o == `ReadDisable) begin
+            reg1_o <= `ZeroWord;
+            end
             end
             
             always @(*) begin

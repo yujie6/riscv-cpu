@@ -14,6 +14,7 @@ module mem(input wire rst,
            input wire mem_we_i,
            input wire mem_load_sign_i,
            output reg [`MemAddrBus] mem_addr_o,       // data addr send to memory
+           output wire [`InstAddrBus] pc_o,
            output reg mem_we_o,                       // write or not
            output reg mem_ce_o,
            output reg [`MemSelBus] mem_sel_o,         // Byte | Half Word | Word
@@ -23,7 +24,7 @@ module mem(input wire rst,
            output reg stallreq_mem_o,
            output reg wreg_o);
     
-    
+    assign pc_o = pc_i;
     reg mem_done;
     
     always @(*) begin

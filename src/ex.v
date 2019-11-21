@@ -80,6 +80,10 @@ module ex(input wire rst,
             endcase
         end
     end
+
+    reg ex_done;
+
+    
     
     // all arithmetic operations are done here including pc
     always @(*) begin
@@ -121,24 +125,37 @@ module ex(input wire rst,
         end
     end
     
+    always @(pc_i) begin
+        ex_done <= 1'b0;
+    end
+
+    always @(*) begin
+        if (rst == `RstEnable) begin
+            ex_done <= 1'b0;
+        end else begin
+            rd_o   <= rd_i;
+            wreg_o <= wreg_i;
+        end
+    end
     // By the inst alusel_i given, choose one as the final result
     // There will only be logic op here
     always @(*) begin
-        rd_o   <= rd_i;
-        wreg_o <= wreg_i;
-        case (alusel_i)
-            `EXE_RES_LOGIC: wdata_o <= logic_out;
-            `EXE_RES_ARITH: wdata_o <= arith_out;
-            `EXE_RES_SHIFT: wdata_o <= shift_out;
-            `EXE_RES_LOAD_STORE: begin
-                wdata_o    <= `ZeroWord;
-                mem_addr_o <= mem_out;
-            end
-            `EXE_RES_JUMP_BRANCH: wdata_o <= link_addr_i;
-            default : begin
-                wdata_o <= `ZeroWord;
-            end
-        endcase
+        if (!ex_done) begin 
+            case (alusel_i)
+                `EXE_RES_LOGIC: wdata_o <= logic_out;
+                `EXE_RES_ARITH: wdata_o <= arith_out;
+                `EXE_RES_SHIFT: wdata_o <= shift_out;
+                `EXE_RES_LOAD_STORE: begin
+                    wdata_o    <= `ZeroWord;
+                    mem_addr_o <= mem_out;
+                end
+                `EXE_RES_JUMP_BRANCH: wdata_o <= link_addr_i;
+                default : begin
+                    wdata_o <= `ZeroWord;
+                end
+            endcase
+            ex_done <= 1'b1;
+        end
     end
     
 endmodule
