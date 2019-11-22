@@ -284,7 +284,7 @@ module id(input wire rst,
             end
             
             `EXE_ALU_IMM: begin
-            // FIXME: The problem is that rd = rs1;
+                // FIXME: The problem is that rd = rs1;
                 wreg_o      <= `WriteEnable;
                 rd_o        <= rd;
                 reg1_read_o <= `ReadEnable;
@@ -293,8 +293,8 @@ module id(input wire rst,
                     // TODO: where is SLTU
                     `EXE_ADDI: begin
                         // 12-bit imm sign extended, then reg[rd] <= imm + reg[rs1]
-                        aluop_o  <= `EXE_ADDI_OP;
-                        alusel_o <= `EXE_RES_ARITH;
+                        aluop_o     <= `EXE_ADDI_OP;
+                        alusel_o    <= `EXE_RES_ARITH;
                         reg2_read_o <= `ReadDisable;
                     end
                     `EXE_SLTI: begin
@@ -411,47 +411,48 @@ module id(input wire rst,
     end
     end
     
-
+    
     // FIXME: The main problem is data hazard now !!!
     always @(*) begin
         if (rst == `RstEnable) begin
             reg1_o <= `ZeroWord;
         end
-        else if ((reg1_read_o == `ReadEnable) && (ex_wreg_forward == `WriteEnable)
-            && (ex_wd_forward == reg1_addr_o)) begin
-            // NOTE: Date forwarding from ex
-            reg1_o <= ex_wdata_forward;
-            end
-        else if ((reg1_read_o == `ReadEnable) && (mem_wreg_forward == `WriteEnable)
-            && (mem_wd_forward == reg1_addr_o))
-            begin
-            // NOTE: Data forwarding from mem
-            reg1_o <= mem_wdata_forward;
-            end
+        // else if ((reg1_read_o == `ReadEnable) && (ex_wreg_forward == `WriteEnable)
+        //     && (ex_wd_forward == reg1_addr_o)) begin
+        //     // NOTE: Date forwarding from ex
+        //     reg1_o <= ex_wdata_forward;
+        //     end
+        // else if ((reg1_read_o == `ReadEnable) && (mem_wreg_forward == `WriteEnable)
+        //     && (mem_wd_forward == reg1_addr_o))
+        //     begin
+        //     // NOTE: Data forwarding from mem
+        //     reg1_o <= mem_wdata_forward;
+        //     $display("wryyyyyyyyyyyyyyyyyyyyyyyy!!!!!!");
+        //     end
         else if (reg1_read_o == `ReadEnable) begin
-            reg1_o <= reg1_data_i; // read from regfile port 1
+        reg1_o <= reg1_data_i; // read from regfile port 1
+    end
+    else if (reg1_read_o == `ReadDisable) begin
+    reg1_o <= `ZeroWord;
+    end
+    end
+    
+    always @(*) begin
+        if (rst == `RstEnable) begin
+            reg2_o <= `ZeroWord;
+            // end else if ((reg2_read_o == `ReadEnable) && (ex_wreg_forward == `WriteEnable)
+            // && (ex_wd_forward == reg2_addr_o)) begin
+            // // NOTE: Date forwarding from ex
+            // reg2_o <= ex_wdata_forward;
+            // end else if ((reg2_read_o == `ReadEnable) && (mem_wreg_forward == `WriteEnable)
+            // && (mem_wd_forward == reg2_addr_o)) begin
+            // // NOTE: Data forwarding from mem
+            // reg2_o <= mem_wdata_forward;
+            end else if (reg2_read_o == `ReadEnable) begin
+            reg2_o <= reg2_data_i; // read from regfile port 2
+            end else begin
+            reg2_o <= `ZeroWord;
         end
-            else if (reg1_read_o == `ReadDisable) begin
-            reg1_o <= `ZeroWord;
-            end
-            end
-            
-            always @(*) begin
-                if (rst == `RstEnable) begin
-                    reg2_o <= `ZeroWord;
-                    end else if ((reg2_read_o == `ReadEnable) && (ex_wreg_forward == `WriteEnable)
-                    && (ex_wd_forward == reg2_addr_o)) begin
-                    // NOTE: Date forwarding from ex
-                    reg2_o <= ex_wdata_forward;
-                    end else if ((reg2_read_o == `ReadEnable) && (mem_wreg_forward == `WriteEnable)
-                    && (mem_wd_forward == reg2_addr_o)) begin
-                    // NOTE: Data forwarding from mem
-                    reg2_o <= mem_wdata_forward;
-                    end else if (reg2_read_o == `ReadEnable) begin
-                    reg2_o <= reg2_data_i; // read from regfile port 2
-                    end else begin
-                    reg2_o <= `ZeroWord;
-                end
-            end
-            
-            endmodule // id
+    end
+    
+endmodule // id

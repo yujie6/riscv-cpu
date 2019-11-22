@@ -140,7 +140,6 @@ module ex(input wire rst,
     // By the inst alusel_i given, choose one as the final result
     // There will only be logic op here
     always @(*) begin
-        if (!ex_done) begin 
             case (alusel_i)
                 `EXE_RES_LOGIC: wdata_o <= logic_out;
                 `EXE_RES_ARITH: wdata_o <= arith_out;
@@ -154,8 +153,6 @@ module ex(input wire rst,
                     wdata_o <= `ZeroWord;
                 end
             endcase
-            ex_done <= 1'b1;
-        end
     end
     
 endmodule
