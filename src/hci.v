@@ -243,6 +243,7 @@ always @*
             end
             // $write("%c", io_din);
             $display("Print one char: %c", io_din);
+            // $display("The ascii value is: ", io_din);
           end
           8'h04: begin      // 0x30004 write: indicates program stop
             if (!tx_full) begin

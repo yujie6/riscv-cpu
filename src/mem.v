@@ -86,6 +86,8 @@ module mem(input wire rst,
     
     always @ (*) begin
         if (rst) begin
+            mem_we_o <= `WriteDisable;
+            mem_addr_o <= `ZeroWord;
             stallreq_mem_o <= 1'b0;
             end else begin
             if (mem_we_i) begin
@@ -192,7 +194,7 @@ module mem(input wire rst,
         if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
             mem_we_o  <= `WriteDisable;
             mem_sel_o <= mem_sel_i;
-            $display("load start", mem_addr_i);
+            // $display("load start", mem_addr_i);
             // load takes 2 cycle
             case (stage_read)
                 5'b00000: begin
