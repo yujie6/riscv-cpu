@@ -284,7 +284,6 @@ module id(input wire rst,
             end
             
             `EXE_ALU_IMM: begin
-                // FIXME: The problem is that rd = rs1;
                 wreg_o      <= `WriteEnable;
                 rd_o        <= rd;
                 reg1_read_o <= `ReadEnable;
@@ -301,10 +300,12 @@ module id(input wire rst,
                         // imm sign extended & rs1 as signed 32-bit
                         // reg[rd] <= (imm > reg[rs1])
                         aluop_o <= `EXE_SLTI_OP;
+                        alusel_o <= `EXE_RES_LOGIC;
                     end
                     `EXE_SLTIU: begin
                         // imm sign extended & rs1 as unsigned 32-bit
                         aluop_o <= `EXE_SLTIU_OP;
+                        alusel_o <= `EXE_RES_LOGIC;
                     end
                     `EXE_XORI: begin
                         // almost the same as ADDI
@@ -326,16 +327,19 @@ module id(input wire rst,
                         // FIXME: Modify alusel here
                         // reg[rd] <= (reg[rs1] << shamt) also called shit amount
                         aluop_o <= `EXE_SLLI_OP;
+                        alusel_o <= `EXE_RES_LOGIC;
                         shamt_o <= rs2;
                     end
                     `EXE_SRLI: begin
                         // reg[rd] < = (reg[rs1] >> shamt) indeed shamt = rs2
                         aluop_o <= `EXE_SRLI_OP;
+                        alusel_o <= `EXE_RES_LOGIC;
                         shamt_o <= rs2;
                     end
                     `EXE_SRAI: begin
                         // reg[rd] <= (reg[rs1] >> shamt) (arithmetic shift, sign-bit->hign bit)
                         aluop_o <= `EXE_SRAI_OP;
+                        alusel_o <= `EXE_RES_LOGIC;
                         shamt_o <= rs2;
                     end
                     default: begin
@@ -370,9 +374,11 @@ module id(input wire rst,
                     end
                     `EXE_SLT: begin
                         aluop_o <= `EXE_SLT_OP;
+                        alusel_o <= `EXE_RES_LOGIC;
                     end
                     `EXE_SLTU: begin
                         aluop_o <= `EXE_SLTU_OP;
+                        alusel_o <= `EXE_RES_LOGIC;
                     end
                     `EXE_XOR: begin
                         aluop_o  <= `EXE_XOR_OP;
@@ -382,9 +388,11 @@ module id(input wire rst,
                         case (funct7)
                             `EXE_SRL: begin
                                 aluop_o <= `EXE_SRL_OP;
+                        alusel_o <= `EXE_RES_LOGIC;
                             end
                             `EXE_SRA: begin
                                 aluop_o <= `EXE_SRA_OP;
+                        alusel_o <= `EXE_RES_LOGIC;
                             end
                             default: begin
                                 

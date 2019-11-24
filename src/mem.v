@@ -151,7 +151,7 @@ module mem(input wire rst,
                         mem_addr_o <= `ZeroWord;
                     end
                     else begin
-                        stage_write <= 5'b00010;
+                        stage_write <= 5'b00011;
                     end
                 end
                 5'b00011: begin
