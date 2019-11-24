@@ -51,6 +51,11 @@ module ex(input wire rst,
                 `EXE_ORI_OP:  logic_out <= $signed(reg1_i) | $signed(imm_i);
                 `EXE_ANDI_OP: logic_out <= $signed(reg1_i) & $signed(imm_i);
                 `EXE_XORI_OP: logic_out <= $signed(reg1_i) ^ $signed(imm_i);
+
+                `EXE_SLT_OP:   logic_out <= $signed(reg1_i) < $signed(reg2_i) ? 1 : 0;
+                `EXE_SLTI_OP:  logic_out <= $signed(reg1_i) < $signed(imm_i) ? 1 : 0;
+                `EXE_SLTU_OP:  logic_out <= reg1_i < reg2_i ? 1 : 0;
+                `EXE_SLTIU_OP: logic_out <= reg1_i < imm_i ? 1 : 0;
                 default : begin
                     logic_out <= `ZeroWord;
                 end
@@ -70,10 +75,6 @@ module ex(input wire rst,
                 `EXE_SRLI_OP:  shift_out <= reg1_i >> shamt_i;
                 `EXE_SRAI_OP:  shift_out <= $signed(reg1_i) >>> shamt_i;
                 // TODO: May need to escape shift
-                `EXE_SLT_OP:   shift_out <= $signed(reg1_i) < $signed(reg2_i);
-                `EXE_SLTI_OP:  shift_out <= $signed(reg1_i) < $signed(imm_i);
-                `EXE_SLTU_OP:  shift_out <= reg1_i < reg2_i;
-                `EXE_SLTIU_OP: shift_out <= reg1_i < imm_i;
                 default : begin
                     shift_out <= `ZeroWord;
                 end
@@ -95,7 +96,7 @@ module ex(input wire rst,
                 `EXE_ADD_OP:   arith_out  <= $signed(reg1_i) + $signed(reg2_i);
                 `EXE_ADDI_OP:  arith_out  <= $signed(reg1_i) + $signed(imm_i);
                 `EXE_SUB_OP:   arith_out  <= $signed(reg1_i) - $signed(reg2_i);
-                `EXE_SUBI_OP:   arith_out <= $signed(reg1_i) - $signed($signed(imm_i));
+                `EXE_SUBI_OP:   arith_out <= $signed(reg1_i) - $signed(imm_i);
                 `EXE_AUIPC_OP: arith_out <= pc_i + imm_i;
                 `EXE_LUI_OP: begin 
                     arith_out <= imm_i;

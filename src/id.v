@@ -143,10 +143,6 @@ module id(input wire rst,
                 wreg_o   <= `WriteEnable;
                 imm_o    <= imm_i;
                 rd_o     <= rd;
-                if (rd == 5'b00000 && rs1 == 5'b00001 && imm_i == `ZeroWord) begin
-                    $display("All process done, now ret");
-                    //$finish;
-                end
                 reg1_read_o          <= `ReadEnable;
                 link_addr_o          <= pc_4;
                 branch_flag_o        <= 1'b1;
@@ -186,7 +182,7 @@ module id(input wire rst,
                     end
                     `EXE_BGE: begin
                         aluop_o <= `EXE_BGE_OP;
-                        if ($signed(reg1_o) > $signed(reg2_o)) begin
+                        if ($signed(reg1_o) >= $signed(reg2_o)) begin
                             branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
@@ -200,7 +196,7 @@ module id(input wire rst,
                     end
                     `EXE_BGEU: begin
                         aluop_o <= `EXE_BGEU_OP;
-                        if (reg1_o == reg2_o) begin
+                        if (reg1_o >= reg2_o) begin
                             branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
@@ -289,7 +285,7 @@ module id(input wire rst,
                 reg1_read_o <= `ReadEnable;
                 imm_o       <= sign_imm_i;
                 case (funct3)
-                    // TODO: where is SLTU
+                    // TODO: Here are all inst with imm
                     `EXE_ADDI: begin
                         // 12-bit imm sign extended, then reg[rd] <= imm + reg[rs1]
                         aluop_o     <= `EXE_ADDI_OP;
@@ -306,6 +302,8 @@ module id(input wire rst,
                         // imm sign extended & rs1 as unsigned 32-bit
                         aluop_o <= `EXE_SLTIU_OP;
                         alusel_o <= `EXE_RES_LOGIC;
+                        // imm_o <= imm_i;
+                        // It's quite strange, we still do sign extension here
                     end
                     `EXE_XORI: begin
                         // almost the same as ADDI
@@ -314,7 +312,6 @@ module id(input wire rst,
                     end
                     `EXE_ORI: begin
                         // almost the same as ADDI
-                        $display("Ori detected");
                         aluop_o  <= `EXE_ORI_OP;
                         alusel_o <= `EXE_RES_LOGIC;
                     end
@@ -327,19 +324,19 @@ module id(input wire rst,
                         // FIXME: Modify alusel here
                         // reg[rd] <= (reg[rs1] << shamt) also called shit amount
                         aluop_o <= `EXE_SLLI_OP;
-                        alusel_o <= `EXE_RES_LOGIC;
+                        alusel_o <= `EXE_RES_SHIFT;
                         shamt_o <= rs2;
                     end
                     `EXE_SRLI: begin
                         // reg[rd] < = (reg[rs1] >> shamt) indeed shamt = rs2
                         aluop_o <= `EXE_SRLI_OP;
-                        alusel_o <= `EXE_RES_LOGIC;
+                        alusel_o <= `EXE_RES_SHIFT;
                         shamt_o <= rs2;
                     end
                     `EXE_SRAI: begin
                         // reg[rd] <= (reg[rs1] >> shamt) (arithmetic shift, sign-bit->hign bit)
                         aluop_o <= `EXE_SRAI_OP;
-                        alusel_o <= `EXE_RES_LOGIC;
+                        alusel_o <= `EXE_RES_SHIFT;
                         shamt_o <= rs2;
                     end
                     default: begin
@@ -357,11 +354,13 @@ module id(input wire rst,
                         case (funct7)
                             `EXE_ADD: begin
                                 aluop_o  <= `EXE_ADD_OP;
-                                alusel_o <= `EXE_RES_LOGIC;
+                                alusel_o <= `EXE_RES_ARITH;
+                                // $display("Add detected");
                             end
                             `EXE_SUB: begin
                                 aluop_o  <= `EXE_SUB_OP;
-                                alusel_o <= `EXE_RES_LOGIC;
+                                alusel_o <= `EXE_RES_ARITH;
+                                // $display("Sub detected");
                             end
                             default: begin
                                 
@@ -388,11 +387,11 @@ module id(input wire rst,
                         case (funct7)
                             `EXE_SRL: begin
                                 aluop_o <= `EXE_SRL_OP;
-                        alusel_o <= `EXE_RES_LOGIC;
+                                alusel_o <= `EXE_RES_SHIFT;
                             end
                             `EXE_SRA: begin
                                 aluop_o <= `EXE_SRA_OP;
-                        alusel_o <= `EXE_RES_LOGIC;
+                                alusel_o <= `EXE_RES_SHIFT;
                             end
                             default: begin
                                 

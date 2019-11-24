@@ -189,6 +189,7 @@ module mem(input wire rst,
     reg [`MemDataBus] byte_read_2;
     reg [`MemDataBus] byte_read_3;
     reg [`MemDataBus] byte_read_4;
+    //FIXME: Encounter fatal error in LW
     
     always @(posedge clk) begin
         if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
