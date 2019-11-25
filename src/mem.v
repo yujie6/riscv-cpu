@@ -44,13 +44,13 @@ module mem(input wire rst,
                 // NOTE: Deal with result of load
                 if (mem_sel_i == `MEM_BYTE) begin
                     if (mem_load_sign_i) begin
-                        wdata_o <= $signed({{24{1'b0}}, byte_read_1});
+                        wdata_o <= $signed({{24{byte_read_1[7]}}, byte_read_1});
                         end else begin
                         wdata_o <= {{24{1'b0}}, byte_read_1};
                     end
                     end else if (mem_sel_i == `MEM_HALF) begin
                     if (mem_load_sign_i) begin
-                        wdata_o <= $signed({{16{1'b0}}, byte_read_2, byte_read_1});
+                        wdata_o <= $signed({{16{byte_read_2[7]}}, byte_read_2, byte_read_1});
                         end else begin
                         wdata_o <= {{16{1'b0}}, byte_read_2, byte_read_1};
                     end
@@ -168,6 +168,7 @@ module mem(input wire rst,
                     end
                     else begin
                         stage_write <= 5'b00101;
+                        $display("Fatal error of STORE");
                     end
                 end
                 default: begin

@@ -214,6 +214,7 @@ module cpu(input wire clk_in,
     .reg1_addr_o(reg1_addr), .reg2_addr_o(reg2_addr),
     .branch_target_addr_o(id_branch_target_addr_o),
     .branch_flag_o(id_branch_flag_o),
+    .branch_cancel_req_i(branch_cancel_req),
     // data send to id_ex
     .aluop_o(id_aluop_o), .alusel_o(id_alusel_o),
     .reg1_o(id_reg1_o), .reg2_o(id_reg2_o),

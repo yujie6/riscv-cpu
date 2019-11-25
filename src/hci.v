@@ -241,16 +241,13 @@ always @*
               d_tx_data = io_din;
               d_wr_en   = 1'b1;
             end
-            // $write("%c", io_din);
-            $display("Print one char: %c", io_din);
-            // $display("The ascii value is: ", io_din);
+            $write("%c", io_din);
           end
           8'h04: begin      // 0x30004 write: indicates program stop
             if (!tx_full) begin
               d_tx_data = 8'h00;
               d_wr_en = 1'b1;
             end
-            //$display("fuck off", );
             $display("IO:Return");
             $finish;
           end

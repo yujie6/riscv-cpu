@@ -149,7 +149,7 @@ module ex(input wire rst,
                     wdata_o    <= `ZeroWord;
                     mem_addr_o <= mem_out;
                 end
-                `EXE_RES_JUMP_BRANCH: wdata_o <= link_addr_i;
+                `EXE_RES_JUMP_BRANCH: if (wreg_o == `WriteEnable) wdata_o <= link_addr_i;
                 default : begin
                     wdata_o <= `ZeroWord;
                 end

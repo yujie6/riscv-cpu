@@ -16,7 +16,7 @@ Disassembly of section .text.startup:
 
 00001000 <main>:
     1000:	000307b7          	lui	a5,0x30
-    1004:	03200713          	li	a4,50 
+    1004:	03200713          	li	a4,50
     1008:	00e78023          	sb	a4,0(a5) # 30000 <__heap_start+0x2e000>
     100c:	00a00713          	li	a4,10
     1010:	00e78023          	sb	a4,0(a5)

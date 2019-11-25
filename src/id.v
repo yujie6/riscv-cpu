@@ -10,6 +10,7 @@ module id(input wire rst,
           input wire [`RegBus] ex_wdata_forward,
           input wire [`RegAddrBus] mem_wd_forward,
           input wire mem_wreg_forward,
+          input wire branch_cancel_req_i,
           input wire [`RegBus] mem_wdata_forward,
           output reg reg1_read_o,                         // Output to regfile
           output reg reg2_read_o,
@@ -56,16 +57,18 @@ module id(input wire rst,
     wire [`RegBus] imm_s = {
     {20{1'b0}},inst_i[31:25],inst_i[11:7]
     };
+    wire [`RegBus] sign_imm_s = {
+    {20{inst_i[31]}},inst_i[31:25],inst_i[11:7]
+    };
     wire [`RegBus] imm_u = {
     inst_i[31:12], {12{1'b0}}
     };
     wire [`RegBus] imm_j = {
-    {11{inst_i[31]}}, inst_i[31], inst_i[19:12], inst_i[20],
+    {12{inst_i[31]}}, inst_i[19:12], inst_i[20],
     inst_i[30:21], 1'b0
     };
     wire [`RegBus] sign_imm_b = {
-    {19{inst_i[31]}},
-    inst_i[31],inst_i[7],inst_i[30:25],inst_i[11:8], 1'b0
+    {20{inst_i[31]}},inst_i[7],inst_i[30:25],inst_i[11:8], 1'b0
     };
     
     
@@ -128,12 +131,13 @@ module id(input wire rst,
                 aluop_o                 <= `EXE_JAL_OP;
                 alusel_o                <= `EXE_RES_JUMP_BRANCH;
                 wreg_o                  <= `WriteEnable;
-                imm_o                   <= $signed(imm_j);
+                imm_o                   <= imm_j;
                 rd_o                    <= rd;
                 link_addr_o             <= pc_4;
-                branch_flag_o           <= 1'b1;
-                branch_target_addr_o    <= pc_i + $signed(imm_j);
-                // branch_target_addr_o <= ;
+                if (branch_cancel_req_i == 1'b0) begin
+                    branch_flag_o           <= 1'b1;
+                    branch_target_addr_o    <= pc_i + imm_j;
+                end
             end
             
             `EXE_JALR: begin
@@ -141,12 +145,14 @@ module id(input wire rst,
                 aluop_o  <= `EXE_JALR_OP;
                 alusel_o <= `EXE_RES_JUMP_BRANCH;
                 wreg_o   <= `WriteEnable;
-                imm_o    <= imm_i;
+                imm_o    <= sign_imm_i;
                 rd_o     <= rd;
                 reg1_read_o          <= `ReadEnable;
                 link_addr_o          <= pc_4;
-                branch_flag_o        <= 1'b1;
-                branch_target_addr_o <= imm_i + reg1_o;
+                if (branch_cancel_req_i == 1'b0) begin
+                    branch_flag_o        <= 1'b1;
+                    branch_target_addr_o <= sign_imm_i + reg1_o;
+                end
             end
             
             `EXE_BRANCH: begin
@@ -161,42 +167,42 @@ module id(input wire rst,
                 case (funct3)
                     `EXE_BEQ: begin
                         aluop_o <= `EXE_BEQ_OP;
-                        if (reg1_o == reg2_o) begin
+                        if (reg1_o == reg2_o && branch_cancel_req_i == 1'b0) begin
                             branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
                     end
                     `EXE_BNE: begin
                         aluop_o <= `EXE_BNE_OP;
-                        if (reg1_o != reg2_o) begin
+                        if (reg1_o != reg2_o && branch_cancel_req_i == 1'b0) begin
                             branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
                     end
                     `EXE_BLT: begin
                         aluop_o <= `EXE_BLT_OP;
-                        if ($signed(reg1_o) < $signed(reg2_o)) begin
+                        if ($signed(reg1_o) < $signed(reg2_o) && branch_cancel_req_i == 1'b0) begin
                             branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
                     end
                     `EXE_BGE: begin
                         aluop_o <= `EXE_BGE_OP;
-                        if ($signed(reg1_o) >= $signed(reg2_o)) begin
+                        if ($signed(reg1_o) >= $signed(reg2_o) && branch_cancel_req_i == 1'b0) begin
                             branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
                     end
                     `EXE_BLTU: begin
                         aluop_o <= `EXE_BLTU_OP;
-                        if (reg1_o < reg2_o) begin
+                        if (reg1_o < reg2_o && branch_cancel_req_i == 1'b0) begin
                             branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
                     end
                     `EXE_BGEU: begin
                         aluop_o <= `EXE_BGEU_OP;
-                        if (reg1_o >= reg2_o) begin
+                        if (reg1_o >= reg2_o && branch_cancel_req_i == 1'b0) begin
                             branch_target_addr_o <= pc_i + sign_imm_b;
                             branch_flag_o        <= 1'b1;
                         end
@@ -212,7 +218,7 @@ module id(input wire rst,
                 reg1_read_o <= `ReadEnable;
                 reg2_read_o <= `ReadDisable;
                 alusel_o    <= `EXE_RES_LOAD_STORE;
-                imm_o       <= imm_i;
+                imm_o       <= sign_imm_i;
                 case (funct3)
                     `EXE_LB: begin
                         aluop_o         <= `EXE_LB_OP;
@@ -256,7 +262,7 @@ module id(input wire rst,
                 reg1_read_o <= `ReadEnable;
                 reg2_read_o <= `ReadEnable;
                 alusel_o    <= `EXE_RES_LOAD_STORE;
-                imm_o       <= imm_s;
+                imm_o       <= sign_imm_s;
                 case (funct3)
                     `EXE_SB: begin
                         aluop_o   <= `EXE_SB_OP;
@@ -327,19 +333,23 @@ module id(input wire rst,
                         alusel_o <= `EXE_RES_SHIFT;
                         shamt_o <= rs2;
                     end
-                    `EXE_SRLI: begin
-                        // reg[rd] < = (reg[rs1] >> shamt) indeed shamt = rs2
-                        aluop_o <= `EXE_SRLI_OP;
-                        alusel_o <= `EXE_RES_SHIFT;
-                        shamt_o <= rs2;
-                    end
-                    `EXE_SRAI: begin
-                        // reg[rd] <= (reg[rs1] >> shamt) (arithmetic shift, sign-bit->hign bit)
-                        aluop_o <= `EXE_SRAI_OP;
-                        alusel_o <= `EXE_RES_SHIFT;
-                        shamt_o <= rs2;
+                    `EXE_SRLI_SRAI: begin
+                        case (funct7)
+                            `EXE_SRLI: begin
+                                aluop_o <= `EXE_SRLI_OP;
+                                alusel_o <= `EXE_RES_SHIFT;
+                                shamt_o <= rs2;
+                            end 
+                            `EXE_SRAI: begin
+                                aluop_o <= `EXE_SRAI_OP;
+                                alusel_o <= `EXE_RES_SHIFT;
+                                shamt_o <= rs2;
+                            end
+                            default: $display("fatal error");
+                        endcase
                     end
                     default: begin
+                         $display("fatal error");
                     end
                 endcase
             end
@@ -363,7 +373,7 @@ module id(input wire rst,
                                 // $display("Sub detected");
                             end
                             default: begin
-                                
+                                 $display("fatal error");
                             end
                         endcase
                     end
@@ -394,7 +404,7 @@ module id(input wire rst,
                                 alusel_o <= `EXE_RES_SHIFT;
                             end
                             default: begin
-                                
+                                 $display("fatal error");
                             end
                         endcase
                     end
@@ -407,12 +417,13 @@ module id(input wire rst,
                         alusel_o <= `EXE_RES_LOGIC;
                     end
                     default: begin
-                        
+                         $display("fatal error");
                     end
                 endcase
             end
             
             default: begin
+                 // $display("fatal error");
             end
         endcase
     end
