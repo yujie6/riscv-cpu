@@ -168,6 +168,12 @@ module cpu(input wire clk_in,
     .mem_addr_o(if_mem_addr),
     .mem_we_o(if_write_enable),
     .mem_byte_i(mem_byte_read),
+    .cache_inst_i(inst_cache_inst),
+    .cache_hit_i(inst_cache_hit),
+    .cache_waddr_o(inst_cache_wpc),
+    .cache_raddr_o(inst_cache_rpc),
+    .cache_winst_o(inst_cache_winst),
+    .cache_we_o(inst_cache_we),
     .stall(stall_sign),
     .inst_o(if_inst_o),
     .if_mem_req_o(if_mem_req),
@@ -176,6 +182,17 @@ module cpu(input wire clk_in,
     .branch_addr_i(id_branch_target_addr_o)
     );
     
+    InstCache InstCache0(
+    .clk(clk_in),
+    .rst(rst_in),
+    .rdy(rdy_in),
+    .we_i(inst_cache_we),
+    .wpc_i(inst_cache_wpc),
+    .winst_i(inst_cache_winst),
+    .rpc_i(inst_cache_rpc),
+    .hit_o(inst_cache_hit),
+    .inst_o(inst_cache_inst)
+);
     
     
     if_id if_id0(
@@ -306,7 +323,7 @@ module cpu(input wire clk_in,
     .load_sign(mem_load_sign_i),
     .mem_aluop(mem_aluop_i), .mem_alusel(mem_alusel_i)
     );
-    // FIXME: PORTS CHECKING (NUMBER AND NAMES)
+
     mem mem0(
     // input from ex_mem
     .clk(clk_in),

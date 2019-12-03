@@ -38,9 +38,9 @@ module InstCache(input wire clk,
             for (i = 0; i < `BlockNum; i = i + 1) begin
                 cache_valid[i] <= 1'b0;
             end
-            end else if (we_i) begin
+            end else if (we_i) begin // write enable
             cache_valid[windex_i] <= 1'b1;
-            cache_tag[windex_i]   <= wpc_i[16:7];
+            cache_tag[windex_i]   <= wtag_i;
             cache_data[windex_i]  <= winst_i;
         end
     end
@@ -51,7 +51,7 @@ module InstCache(input wire clk,
             hit_o  <= 1'b0;
             inst_o <= `ZeroWord;
             end else begin
-            if (!(rindex_i ^ windex_i) && we_i) begin
+            if (!(rindex_i ^ windex_i) && we_i) begin // rindex_i == windex_i
                 hit_o  <= 1'b1;
                 inst_o <= winst_i;
                 end else if (!(rtag_i ^ rtag_c) && rvalid) begin
