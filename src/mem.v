@@ -75,6 +75,13 @@ module mem(input wire rst,
     wire [`MemAddrBus] byte_addr_3;
     wire [`MemAddrBus] byte_addr_4;
     
+    reg mem_read_done;
+    reg [4:0] stage_read;
+    reg [`MemDataBus] byte_read_1;
+    reg [`MemDataBus] byte_read_2;
+    reg [`MemDataBus] byte_read_3;
+    reg [`MemDataBus] byte_read_4;
+
     assign byte_write_1 = mem_reg2_i[7:0];
     assign byte_write_2 = mem_reg2_i[15:8];
     assign byte_write_3 = mem_reg2_i[23:16];
@@ -184,13 +191,7 @@ module mem(input wire rst,
         end
     end
     
-    reg mem_read_done;
-    reg [4:0] stage_read;
-    reg [`MemDataBus] byte_read_1;
-    reg [`MemDataBus] byte_read_2;
-    reg [`MemDataBus] byte_read_3;
-    reg [`MemDataBus] byte_read_4;
-    //FIXME: Encounter fatal error in LW
+    
     
     always @(posedge clk) begin
         if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin

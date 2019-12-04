@@ -1,0 +1,8 @@
+prefix=/home/yujie6/Music/CSAPP/Arch2019/RiscV-CPU/serial/build/devel
+
+Name: serial
+Description: Description of serial
+Version: 1.2.1
+Cflags: -I/home/yujie6/Music/CSAPP/Arch2019/RiscV-CPU/serial/include
+Libs: -L/home/yujie6/Music/CSAPP/Arch2019/RiscV-CPU/serial/build/devel/lib -lserial -lrt -lpthread
+Requires: 

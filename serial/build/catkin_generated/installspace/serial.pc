@@ -1,0 +1,8 @@
+prefix=/tmp/usr/local
+
+Name: serial
+Description: Description of serial
+Version: 1.2.1
+Cflags: -I/tmp/usr/local/include
+Libs: -L/tmp/usr/local/lib -lserial -lrt -lpthread
+Requires: 
