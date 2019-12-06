@@ -51,11 +51,14 @@ module IF(input wire clk,
             end else if (stall[0] == `NoStop && branch_flag_i == 1'b1) begin
             pc                  <= branch_addr_i;
             cache_raddr_o       <= branch_addr_i;
+            cache_we_o <= 1'b0;
             stage               <= 4'b0000;
             branch_cancel_req_o <= 1'b1;
             if_mem_req_o        <= 1'b1;
             end else if (stall[0] == `NoStop && if_mem_req_o == 1'b0 && first_fetch == 1'b0) begin
             pc                  <= pc + 4'h4;
+            cache_waddr_o       <= `ZeroWord;
+            cache_we_o <= 1'b0;
             stage               <= 4'b0000;
             if_mem_req_o        <= 1'b1;
             branch_cancel_req_o <= 1'b0;
