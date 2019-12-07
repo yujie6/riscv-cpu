@@ -137,26 +137,25 @@ Disassembly of section .text.startup:
     11ac:	00112e23          	sw	ra,28(sp)
     11b0:	00812c23          	sw	s0,24(sp)
     11b4:	01312623          	sw	s3,12(sp)
-    11b8:	00b78733          	add	a4,a5,a1 //a4=
+    11b8:	00b78733          	add	a4,a5,a1
     11bc:	ffe60613          	addi	a2,a2,-2 # 3ffffffe <__heap_start+0x3fffdffe>
     11c0:	26882503          	lw	a0,616(a6) # 1268 <A>
     11c4:	00001937          	lui	s2,0x1
     11c8:	04e66663          	bltu	a2,a4,1214 <main+0x8c>
     11cc:	26492703          	lw	a4,612(s2) # 1264 <B>
-    // a5=0x11, a0=0x03, a4=0x9
-    11d0:	40a786b3          	sub	a3,a5,a0 // a3=a5-a0=0xe
-    11d4:	40a68533          	sub	a0,a3,a0 // a0=0xb
-    11d8:	00151513          	slli	a0,a0,0x1 // a0=0x16
-    11dc:	00e686b3          	add	a3,a3,a4 // a3=a3+a4=0x17
-    11e0:	40a68533          	sub	a0,a3,a0 // a0 = 0x1
-    11e4:	40a787b3          	sub	a5,a5,a0 // a5= 0x10
-    11e8:	40a786b3          	sub	a3,a5,a0 //a3= 0xf
-    11ec:	00169693          	slli	a3,a3,0x1 // a3= 0x1e
-    11f0:	00e78733          	add	a4,a5,a4 // a4=0x19
-    11f4:	40d70733          	sub	a4,a4,a3 // a4=0x19-0x1e = -0x5
-    11f8:	00e787b3          	add	a5,a5,a4 // a5=a5+a4=0x5
-    11fc:	40d787b3          	sub	a5,a5,a3 //a5=0x5-0x1e
-    1200:	00b786b3          	add	a3,a5,a1 // a3=a5+a1
+    11d0:	40a786b3          	sub	a3,a5,a0
+    11d4:	40a68533          	sub	a0,a3,a0
+    11d8:	00151513          	slli	a0,a0,0x1
+    11dc:	00e686b3          	add	a3,a3,a4
+    11e0:	40a68533          	sub	a0,a3,a0
+    11e4:	40a787b3          	sub	a5,a5,a0
+    11e8:	40a786b3          	sub	a3,a5,a0
+    11ec:	00169693          	slli	a3,a3,0x1
+    11f0:	00e78733          	add	a4,a5,a4
+    11f4:	40d70733          	sub	a4,a4,a3
+    11f8:	00e787b3          	add	a5,a5,a4
+    11fc:	40d787b3          	sub	a5,a5,a3
+    1200:	00b786b3          	add	a3,a5,a1
     1204:	fcd676e3          	bgeu	a2,a3,11d0 <main+0x48>
     1208:	26a82423          	sw	a0,616(a6)
     120c:	26e92223          	sw	a4,612(s2)

@@ -82,9 +82,9 @@ module single_port_ram_sync#(parameter ADDR_WIDTH=6, parameter DATA_WIDTH=8)(
             ram[i] = 0;
         end
         $readmemh("test.mem", ram);
-        $display("ram initialize done...");
-        $display(ram[0],ram[1],ram[2],ram[3]);
-        $display(ram[0],ram[8],ram[16],ram[24]);
+        // $display("ram initialize done...");
+        // $display(ram[0],ram[1],ram[2],ram[3]);
+        // $display(ram[0],ram[8],ram[16],ram[24]);
         // add test.data to vivado project or specify a valid file path
     end
 
