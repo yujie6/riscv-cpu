@@ -17,7 +17,6 @@ void printBoard() {
         println("");
     }
     println("");
-    sleep(50); // to prevent UART buffer from overflowing
 }
 
 void search(int c) {

@@ -37,7 +37,6 @@ int main() {
     for (i = 1; i <= n; i++) {
 		outl(a[i]);
 		print(" ");
-        sleep(1); // to prevent UART buffer from overflowing
 	}
     print("\n");
     return 0;
