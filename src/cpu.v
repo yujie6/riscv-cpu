@@ -183,13 +183,13 @@ module cpu(input wire clk_in,
     );
     
     InstCache InstCache0(
-    .clk(clk_in),
-    .rst(rst_in),
+    .clk_i(clk_in),
+    .rst_i(rst_in),
     .rdy(rdy_in),
     .we_i(inst_cache_we),
-    .wpc_i(inst_cache_wpc),
-    .winst_i(inst_cache_winst),
-    .rpc_i(inst_cache_rpc),
+    .write_pc_i(inst_cache_wpc),
+    .write_inst_i(inst_cache_winst),
+    .read_pc_i(inst_cache_rpc),
     .hit_o(inst_cache_hit),
     .inst_o(inst_cache_inst)
 );

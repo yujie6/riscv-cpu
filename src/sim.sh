@@ -13,5 +13,5 @@ else
     cp ../testdata/data/$1.data ./test.mem
 fi
 
-iverilog -o run_sim ../sim/testbench.v ./*.v ./common/block_ram/block_ram.v ./common/fifo/fifo.v ./common/uart/*.v
+iverilog -o run_sim ../sim/testbench.v ./*.v ./common/block_ram/block_ram.v ./common/fifo/fifo.v ./common/uart/*.v 
 ./run_sim
