@@ -343,7 +343,7 @@ module cpu(input wire clk_in,
     .mem_write_byte_o(mem_write_byte_o),
     .mem_addr_o(mem_mem_addr_o),
     .mem_we_o(mem_we_o),
-    .mem_ce_o(rom_ce_o),
+    //.mem_ce_o(rom_ce_o),
     .mem_read_byte_i(mem_byte_read),
     // output to mem_wb
     .wreg_o(mem_wreg_o), .wdata_o(mem_wdata_o),

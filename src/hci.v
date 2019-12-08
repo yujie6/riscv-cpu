@@ -233,7 +233,6 @@ always @*
       d_err_code[DBG_UART_PARITY_ERR] = 1'b1;
 
     if (~q_io_en & io_en) begin
-      //$display("mother fucker");
       if (io_wr) begin
         case (io_sel)
           8'h00: begin      // 0x30000 write: output byte

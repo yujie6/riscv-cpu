@@ -7,7 +7,7 @@ then
     echo "Random test"
     if [ ! -f test.mem ]; then mv ../testdata/data/expr.data ./test.mem; fi
 else 
-    echo "Test for $1"
+    echo -e "${BGreen}Testing for $1${NC}, good luck."
 
     if [ -f test.mem ]; then rm test.mem; fi
     cp ../testdata/data/$1.data ./test.mem

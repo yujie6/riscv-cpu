@@ -31,58 +31,69 @@ module IF(input wire clk,
     always @(posedge clk) begin
         if (rst == `RstEnable) begin
             ce <= `ChipDisable;
-            first_fetch = 1'b1;
-            cache_waddr_o <= `ZeroWord;
-            cache_we_o    <= 1'b0;
-            cache_winst_o <= `ZeroWord;
-            cache_raddr_o <= `ZeroWord;
             end else begin
             ce <= `ChipEnable;
         end
     end
     
+    // always @(posedge clk) begin
+    //     if (ce == `ChipDisable) begin
+    //         end else if (stall[0] == `NoStop && branch_flag_i == 1'b1) begin
+    //         pc                  <= branch_addr_i;
+    //         // cache_raddr_o    <= branch_addr_i;
+    //         // stage               <= 4'b0000;
+    //         branch_cancel_req_o <= 1'b1;
+    //         if_mem_req_o        <= 1'b1;
+    //         end else if (stall[0] == `NoStop && if_mem_req_o == 1'b0 && first_fetch == 1'b0) begin
+    //         pc                  <= pc + 4'h4;
+    //         // stage               <= 4'b0000;
+    //         if_mem_req_o        <= 1'b1;
+    //         branch_cancel_req_o <= 1'b0;
+    //     end
+    // end
+    
+    
+    
     always @(posedge clk) begin
         if (ce == `ChipDisable) begin
+            cache_waddr_o <= `ZeroWord;
+            cache_we_o    <= 1'b0;
+            cache_winst_o <= `ZeroWord;
+            cache_raddr_o <= `ZeroWord;
+            mem_addr_o    <= `ZeroWord;
             pc                  <= `ZeroWord;
             if_mem_req_o        <= 1'b0;
             branch_cancel_req_o <= 1'b0;
-            stage               <= 4'b0000;
-            // TODO: Consider Jumping later
-            end else if (stall[0] == `NoStop && branch_flag_i == 1'b1) begin
+            stage         <= 4'b0000;
+            first_fetch = 1'b1;
+            end else begin
+
+            if (stall[0] == `NoStop && branch_flag_i == 1'b1) begin
             pc                  <= branch_addr_i;
-            cache_raddr_o       <= branch_addr_i;
-            cache_we_o <= 1'b0;
-            stage               <= 4'b0000;
+            // cache_raddr_o    <= branch_addr_i;
+            // stage               <= 4'b0000;
             branch_cancel_req_o <= 1'b1;
             if_mem_req_o        <= 1'b1;
             end else if (stall[0] == `NoStop && if_mem_req_o == 1'b0 && first_fetch == 1'b0) begin
             pc                  <= pc + 4'h4;
-            cache_waddr_o       <= `ZeroWord;
-            cache_we_o <= 1'b0;
-            stage               <= 4'b0000;
+            // stage               <= 4'b0000;
             if_mem_req_o        <= 1'b1;
             branch_cancel_req_o <= 1'b0;
-        end
-    end
-    
-    
-    
-    always @(posedge clk) begin
-        if (ce == `ChipDisable) begin
-            mem_addr_o <= `ZeroWord;
-            end else begin
+            end
+
             mem_we_o <= 1'b0;
             if (if_mem_req_o == 1'b1 || first_fetch == 1'b1) begin
                 case (stage)
                     4'b0000: begin
+                        cache_we_o    <= 1'b0;
+                        cache_waddr_o <= `ZeroWord;
                         if (stall[6]) begin
                             stage <= 4'b1000;
                         end
                         else begin
-                            mem_addr_o   <= pc;
+                            mem_addr_o    <= pc;
                             cache_raddr_o <= pc;
-                            stage        <= 4'b0001;
-                            if_mem_req_o <= 1'b1;
+                            stage         <= 4'b0001;
                         end
                         //$display("yes, send byte_addr_1");
                     end
@@ -90,7 +101,6 @@ module IF(input wire clk,
                         if (!stall[6]) begin
                             stage        <= 4'b0001;
                             mem_addr_o   <= pc;
-                            if_mem_req_o <= 1'b1;
                         end
                     end
                     4'b0001: begin
@@ -102,7 +112,7 @@ module IF(input wire clk,
                             inst_o       <= cache_inst_i;
                             if_mem_req_o <= 1'b0;
                             first_fetch  <= 1'b0;
-                        end 
+                        end
                         else begin
                             mem_addr_o     <= pc + 1;
                             stage          <= 4'b0010;
@@ -189,13 +199,13 @@ module IF(input wire clk,
                         if (stall[6]) begin // resent pc + 3
                             stage <= 4'b1101;
                             end else begin
-                                stage        <= 4'b0000;
-                                inst_o       <= {mem_byte_i, inst_block3, inst_block2, inst_block1};
-                                cache_we_o   <= `WriteEnable;
+                                stage         <= 4'b0000;
+                                inst_o        <= {mem_byte_i, inst_block3, inst_block2, inst_block1};
+                                cache_we_o    <= `WriteEnable;
                                 cache_waddr_o <= cache_raddr_o;
                                 cache_winst_o <= {mem_byte_i, inst_block3, inst_block2, inst_block1};
-                                if_mem_req_o <= 1'b0;
-                                first_fetch  <= 1'b0;
+                                if_mem_req_o  <= 1'b0;
+                                first_fetch   <= 1'b0;
                             end
                         end
                         default: ;
