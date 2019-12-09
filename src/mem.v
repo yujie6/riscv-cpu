@@ -35,7 +35,6 @@ module mem(input wire rst,
             wreg_o           <= `WriteDisable;
             mem_sel_o        <= `MEM_NOP;
             mem_addr_o <= `ZeroWord;
-            stallreq_mem_o   <= 1'b0;
             end else begin
             mem_addr_o <= (mem_we_i == 1'b1) ? mem_addr_write : mem_addr_read; 
             rd_o     <= rd_i;
@@ -114,17 +113,24 @@ module mem(input wire rst,
         end
     end
     
-    always @(pc_i) begin
-        mem_done <= 1'b0;
-        mem_read_done <= 1'b0;
-    end
+    // always @(pc_i) begin
+    //     mem_done <= 1'b0;
+    //     mem_read_done <= 1'b0;
+    // end
+    reg [`InstAddrBus] OldPC_write, OldPC_read;
     
     // There shall be some kind of delay
     always @(posedge clk) begin
         if (rst) begin
+            OldPC_write <= pc_i;
             mem_we_o <= `WriteDisable;
         end
-        else if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b1) begin
+        else begin
+            if (pc_i != OldPC_write) begin
+                OldPC_write <= pc_i;
+                mem_done <= 1'b0;
+            end
+        if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b1) begin
             mem_we_o  <= `WriteEnable;
             case (stage_write)
                 5'b00000: begin
@@ -188,12 +194,20 @@ module mem(input wire rst,
             if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
                 mem_we_o  <= `WriteDisable;    
             end
+        end
         end 
     end
     
     
     
     always @(posedge clk) begin
+        if (rst) begin
+            OldPC_read <= pc_i;
+        end else begin
+            if (pc_i != OldPC_read) begin
+                OldPC_read <= pc_i;
+                mem_read_done <= 1'b0;
+            end
         if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
             // $display("load start", mem_addr_i);
             // load takes 2 cycle
@@ -242,6 +256,7 @@ module mem(input wire rst,
             endcase
             end else begin
             stage_read    <= {5{1'b0}};
+        end
         end
     end
     
