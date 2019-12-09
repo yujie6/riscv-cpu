@@ -12,10 +12,11 @@ module mem_wb(input wire clk,
               output reg wb_wreg);
     reg wb_done;
     reg inst_valid;
+    reg [`InstAddrBus] OldPc; 
 
-    always @(wb_pc_i) begin
-        wb_done = 1'b0;
-    end
+    // always @(wb_pc_i) begin
+    //     wb_done = 1'b0;
+    // end
     
     always @(*) begin
         if (mem_rd == `NOPRegAddr && mem_wdata == `ZeroWord) begin
@@ -31,7 +32,13 @@ module mem_wb(input wire clk,
             wb_wdata <= `ZeroWord;
             wb_wreg  <= `WriteDisable;
             wb_done  <= 1'b0;
-            end else if (stall[3] == `Stop && stall[4] == `NoStop) begin
+            OldPc <= wb_pc_i;
+            end else begin
+            if (wb_pc_i != OldPc) begin
+                wb_done <= 1'b0;
+                OldPc <= wb_pc_i;
+            end
+            if (stall[3] == `Stop && stall[4] == `NoStop) begin
             wb_rd    <= `NOPRegAddr;
             wb_wdata <= `ZeroWord;
             wb_wreg  <= `WriteDisable;
@@ -40,6 +47,7 @@ module mem_wb(input wire clk,
             wb_wdata <= mem_wdata;
             wb_wreg  <= mem_wreg;
             wb_done  <= 1'b1;
+            end 
         end
         
     end
