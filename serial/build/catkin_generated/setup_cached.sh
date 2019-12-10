@@ -6,7 +6,7 @@
 
 # new environment variables
 export CMAKE_PREFIX_PATH="/home/yujie6/Music/CSAPP/Arch2019/RiscV-CPU/serial/build/devel"
-export LD_LIBRARY_PATH="/home/yujie6/Music/CSAPP/Arch2019/RiscV-CPU/serial/build/devel/lib"
 export PKG_CONFIG_PATH="/home/yujie6/Music/CSAPP/Arch2019/RiscV-CPU/serial/build/devel/lib/pkgconfig"
 
 # modified environment variables
+export LD_LIBRARY_PATH="/home/yujie6/Music/CSAPP/Arch2019/RiscV-CPU/serial/build/devel/lib:$LD_LIBRARY_PATH"

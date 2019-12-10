@@ -51,15 +51,23 @@ Intermediate files:
 - testdata/data/testname.data: RAM data that can be read by verilog
 - testdata/bin/testname.bin: RAM data in binary
 - testdata/dump/testname.dump: decompilation of the ELF file
+
+### 1.3 Simulations and Tests
+* Using Vivado: Just move the `.data`  file to the src directory and run simulation. 
+* Using Iverilog: Iverilog is a light weight and open source simulator, which is easy to install with `apt` and fast to simulate. Here I wrote a script `sim.sh` to help me test my CPU, just type 
+```bash
+cd src
+./sim.sh testname
+``` 
 ## 2. The Architecture
 ### 2.1 Five Stage
 The five stages are the same with the classic five stage architecture.
 ### 2.2 Stall Controller
 ### 2.3 Memory Controller
+### 2.4 Instruction Cache
 
-## 3. Implementation Details 
+## 3. Go on Board 
 
-## 4. Some Suggestions 
 
 ## References
 [1] 手把手教你设计CPU--RISC-V处理器篇,胡振波,人民邮电出版社,2018

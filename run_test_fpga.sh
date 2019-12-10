@@ -17,7 +17,7 @@ if [ -f ./testcase/$@.ans ]; then cp ./testcase/$@.ans ./tmp/$@.ans; fi
 
 # add your own test script here
 # Example: assuming serial port on /dev/ttyUSB1
-
+echo "Testing for $1, start now..."
 ./ctrl/build.sh
 ./ctrl/run.sh ./testdata/bin/$@.bin ./tmp/$@.in /dev/ttyUSB1 -I
 

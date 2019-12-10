@@ -558,8 +558,8 @@ clean: tests/CMakeFiles/run_tests_serial.dir/clean
 # Target rules for target tests/CMakeFiles/_run_tests_serial_gtest_serial-test.dir
 
 # All Build rule for target.
-tests/CMakeFiles/_run_tests_serial_gtest_serial-test.dir/all: tests/CMakeFiles/serial-test.dir/all
 tests/CMakeFiles/_run_tests_serial_gtest_serial-test.dir/all: CMakeFiles/tests.dir/all
+tests/CMakeFiles/_run_tests_serial_gtest_serial-test.dir/all: tests/CMakeFiles/serial-test.dir/all
 tests/CMakeFiles/_run_tests_serial_gtest_serial-test.dir/all: tests/CMakeFiles/clean_test_results_serial.dir/all
 	$(MAKE) -f tests/CMakeFiles/_run_tests_serial_gtest_serial-test.dir/build.make tests/CMakeFiles/_run_tests_serial_gtest_serial-test.dir/depend
 	$(MAKE) -f tests/CMakeFiles/_run_tests_serial_gtest_serial-test.dir/build.make tests/CMakeFiles/_run_tests_serial_gtest_serial-test.dir/build
