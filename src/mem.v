@@ -123,6 +123,7 @@ module mem(input wire rst,
     always @(posedge clk) begin
         if (rst) begin
             mem_we_o <= `WriteDisable;
+            mem_addr_write <= `ZeroWord;
         end
         else if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b1) begin
             mem_we_o  <= `WriteEnable;
@@ -194,7 +195,9 @@ module mem(input wire rst,
     
     
     always @(posedge clk) begin
-        if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
+        if (rst == `RstEnable) begin 
+            mem_addr_write <= `ZeroWord;
+        end else if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
             // $display("load start", mem_addr_i);
             // load takes 2 cycle
             case (stage_read)
