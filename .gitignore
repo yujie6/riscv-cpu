@@ -1,5 +1,8 @@
 testdata
 test.mem
+.vscode
+run_sim
+tmp
 *.vcd
 *.tex
 ## Core latex/pdflatex auxiliary files:
