@@ -124,6 +124,7 @@ module mem(input wire rst,
         if (rst) begin
             OldPC_write <= pc_i;
             mem_we_o <= `WriteDisable;
+            mem_addr_write <= `ZeroWord;
         end
         else begin
             if (pc_i != OldPC_write) begin
@@ -203,6 +204,7 @@ module mem(input wire rst,
     always @(posedge clk) begin
         if (rst) begin
             OldPC_read <= pc_i;
+            mem_addr_read <= `ZeroWord;
         end else begin
             if (pc_i != OldPC_read) begin
                 OldPC_read <= pc_i;
