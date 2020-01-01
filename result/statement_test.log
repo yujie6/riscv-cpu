@@ -1,0 +1,27 @@
+RAM size: 13d8
+13 06 05 00 13 05 00 00 93 f6 15 00 63 84 06 00 
+33 05 c5 00 93 d5 15 00 13 16 16 00 e3 96 05 fe 
+67 80 00 00 63 40 05 06 63 c6 05 06 13 86 05 00 
+93 05 05 00 13 05 f0 ff 63 0c 06 02 93 06 10 00 
+INPUT size: 2
+31 30 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+initialized UART port on: /dev/ttyUSB1
+55 41 52 54 
+55 41 52 54 
+uploading RAM: 13d8 blks:5
+blk:0 ofs:0000
+blk:1 ofs:0400
+blk:2 ofs:0800
+blk:3 ofs:0c00
+blk:4 ofs:1000
+RAM uploaded
+uploading INPUT: 2 blks:1
+blk:0 ofs:0000
+INPUT uploaded
+Enter r to run, q to quit, p to get cpu PC(demo)
+r
+CPU start
+1
+2
+
+CPU returned with running time: 0.005584

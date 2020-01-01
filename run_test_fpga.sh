@@ -19,7 +19,10 @@ if [ -f ./testcase/$@.ans ]; then cp ./testcase/$@.ans ./tmp/$@.ans; fi
 # Example: assuming serial port on /dev/ttyUSB1
 echo "Testing for $1, start now..."
 ./ctrl/build.sh
-./ctrl/run.sh ./testdata/bin/$@.bin ./tmp/$@.in /dev/ttyUSB1 -I
+# ./ctrl/run.sh ./testdata/bin/$@.bin ./tmp/$@.in /dev/ttyUSB1 -I > $@.log
+echo "Generating log file"
+./ctrl/run.sh ./testdata/bin/$@.bin ./tmp/$@.in /dev/ttyUSB1 -I 
+# cat ./result/$@.log
 
 #./ctrl/run.sh ./test/test.bin ./test/test.in /dev/ttyUSB1 -T > ./test/test.out
 #if [ -f ./test/test.ans ]; then diff ./test/test.ans ./test/test.out; fi

@@ -19,7 +19,6 @@ module riscv_top#(parameter SIM = 0)
     wire clk;
     wire rom_ce;
     wire locked;
-    // assign EXCLK (or your own clock module) to clk
     assign clk = EXCLK;
     
     always @(posedge clk or posedge btnC)
