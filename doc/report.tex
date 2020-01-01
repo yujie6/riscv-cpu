@@ -1,0 +1,53 @@
+\input{./preamble.tex}
+\title{\Huge\textsc{RISC-V CPU Project Report}}
+\begin{document}
+\maketitle
+ 
+\section{简介}
+本次大作业主要目的是实现一个基于RISCV架构, rv32ia指令集的CPU。本项目一共实现了以下内容：
+\begin{itemize}
+		\item 取指-译码-执行-访存-回写的五级流水架构
+		\item FPGA 100MHz 测试通过
+		\item 512Byte的指令缓存，可以容纳128条instruction，pi测试点时间为3.9s
+（注：FPGA上测试时需要将Synthesis Settings里面的Fanout Limits改为600）
+\end{itemize}
+
+本项目主要使用verilog硬件设计语言编写，使用iverilog进行模拟，Xilinx Vivado进行仿真综合。
+\section{基本架构}
+		在写完大作业之后我才发现iverilog是一个很好测试正确性的工具。
+		我还写了一个脚本来进行快速测试，十分方便。
+\section{实现细节}
+\section{遇到的问题}
+在作业过程中，我主要遇到了一下问题
+\begin{itemize}
+		\item 安装RiscV Toolchain失败，之后我
+				在官方社区提了issue并得到了解答，发现是大作业仓库上的的安装
+				教程有问题。采用社区提供的安装教程我成功的安装上了，并且
+				我写了一个更方便的脚本来生成.data文件。
+		\item Linux上的Vivado有比较严重的bug，最开始我根本安装不上
+				之后向社区提问之后我才知道是有两个动态链接库缺失了，
+				手动创建软链接之后可以安装。之后Simulate的时候
+				又出现了奇怪的报错，google之后也解决了这个问题。
+		\item 上板的时候我遇到了许多的critical warning。但是当我
+				解决其中的两个warning之后，我发现自己的正确性又
+				出大问题了，因为我有一个变量memdone必需在两个
+				always语句中使用，尝试了很多方法都没解决。最后
+				换了一个思路解决了这个问题。
+\end{itemize}
+\section{大作业心得}
+本次大作业我学到了很多：
+\begin{itemize}
+		\item 对五级流水以及教材中的一些设计思想更加熟悉了。
+		\item 学习了新的硬件设计语言，提升了自己的编程能力与设计能力。
+		\item 对数字电路更加了解了。
+\end{itemize}
+\section{关于大作业的建议}
+\begin{itemize}
+		\item riscv-toolchain的安装教程需要更新，
+				因为版本的错误浪费了很多时间在上面。
+		\item 上板的教程和资料不够详细，很多时候错了不知道为什么，
+				问了同学才知道。
+\end{itemize}
+
+
+\end{document}

@@ -2,6 +2,7 @@
 
 module if_id(input wire clk,
              input wire rst,
+             input wire rdy,
              input wire[`InstAddrBus] if_pc,
              input wire[`InstBus] if_inst,
              input wire[6:0] stall,

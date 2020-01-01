@@ -8,6 +8,7 @@
 
 module StallController(
     input wire rst,
+    input wire rdy,
     input wire stallreq_ex,
     input wire stallreq_id,
     input wire stallreq_mem,

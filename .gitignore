@@ -1,15 +1,9 @@
 testdata
 test.mem
 .vscode
-<<<<<<< HEAD
 run_sim
 tmp
-=======
-tmp
-run_sim
->>>>>>> 20baedcbd3fc741cad0add7d1a812dc06f3aa152
 *.vcd
-*.tex
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof

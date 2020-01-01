@@ -133,7 +133,7 @@ module cpu(input wire clk_in,
     end
     
     MemController MemControl0(
-            .rst(rst_in),
+            .rst(rst_in), .rdy(rdy_in),
             .if_mem_req_i(if_mem_req),
             .mem_mem_req_i(mem_mem_req),
             .mem_write_enable_i(mem_we_o),
@@ -153,7 +153,7 @@ module cpu(input wire clk_in,
     );
     
     StallController StallController0(
-    .rst(rst_in),
+    .rst(rst_in), .rdy(rdy_in),
     .stall(stall_sign),
     .stallreq_mem(stallreq_mem),
     .stallreq_ex(stallreq_ex),
@@ -185,7 +185,7 @@ module cpu(input wire clk_in,
     InstCache InstCache0(
     .clk_i(clk_in),
     .rst_i(rst_in),
-    .rdy(rdy_in),
+    .rdy_i(rdy_in),
     .we_i(inst_cache_we),
     .write_pc_i(inst_cache_wpc),
     .write_inst_i(inst_cache_winst),
@@ -251,7 +251,7 @@ module cpu(input wire clk_in,
     );
     
     regfile regfile0(
-    .clk(clk_in), .rst(rst_in),
+    .clk(clk_in), .rst(rst_in), .rdy(rdy_in),
     .we(wb_wreg_i), .waddr(wb_wd_i),
     .wdata(wb_wdata_i), .re1(reg1_read),
     .raddr1(reg1_addr), .rdata1(reg1_data),

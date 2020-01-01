@@ -56,7 +56,7 @@ module IF(input wire clk,
     
     
     always @(posedge clk) begin
-        if (ce == `ChipDisable) begin
+        if (rst == `RstEnable) begin
             cache_waddr_o <= `ZeroWord;
             cache_we_o    <= 1'b0;
             cache_winst_o <= `ZeroWord;
@@ -66,7 +66,9 @@ module IF(input wire clk,
             if_mem_req_o        <= 1'b0;
             branch_cancel_req_o <= 1'b0;
             stage         <= 4'b0000;
-            first_fetch = 1'b1;
+            first_fetch <= 1'b1;
+            inst_o <= `ZeroWord;
+            
             end else begin
 
             if (stall[0] == `NoStop && branch_flag_i == 1'b1) begin

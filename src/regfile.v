@@ -2,6 +2,7 @@
 
 module regfile(input wire clk,
                input wire rst,
+               input wire rdy,
                input wire we,                  // write or not
                input wire[`RegAddrBus] waddr,
                input wire[`RegBus] wdata,
@@ -59,7 +60,7 @@ module regfile(input wire clk,
     
     // ----------- wirte operation --------------
     always @(posedge clk) begin
-        if (rst == `RstDisable) begin
+        if (rst == `RstDisable && rdy) begin
             if ((we == `WriteEnable) && (waddr != `RegNumLog2'h0))
             begin
                 regs[waddr] <= wdata;
@@ -68,7 +69,7 @@ module regfile(input wire clk,
     end
     // ------------ read operation ---------------
     always @(*) begin
-        if (rst == `RstEnable || raddr1 == `RegNumLog2'h0) begin
+        if (rst == `RstEnable || !rdy || raddr1 == `RegNumLog2'h0) begin
             // Knowing that register 0 is always ZEROWORD
             rdata1 <= `ZeroWord;
             end else if ((raddr1 == waddr) && (we == `WriteEnable) &&
@@ -84,7 +85,7 @@ module regfile(input wire clk,
     end
     
     always @(*) begin
-        if (rst == `RstEnable || raddr2 == `RegNumLog2'h0) begin
+        if (rst == `RstEnable || !rdy || raddr2 == `RegNumLog2'h0) begin
             rdata2 <= `ZeroWord;
             end else if ((raddr2 == waddr) && (we == `WriteEnable) &&
             (re2 == `ReadEnable)) begin

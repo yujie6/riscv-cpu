@@ -1,5 +1,6 @@
 `include"defines.v"
 module MemController (input wire rst,
+                      input wire rdy,
                       input wire if_mem_req_i,
                       input wire mem_mem_req_i,
                       input wire mem_write_enable_i,
@@ -16,12 +17,13 @@ module MemController (input wire rst,
                       output reg mem_stall_req_o);
     
     always @ (*) begin
-        if (rst) begin
+        if (rst || !rdy) begin
             write_enable_o  <= 1'b0;
             mem_addr_o      <= `ZeroWord;
             mem_data_o      <= 8'h00;
             if_stall_req_o  <= 1'b0;
             mem_stall_req_o <= 1'b0;
+            mem_write <= 8'h00;
             end else begin
             write_enable_o <= 1'b0;
             mem_addr_o     <= `ZeroWord;

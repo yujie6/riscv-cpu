@@ -82,9 +82,6 @@ module ex(input wire rst,
         end
     end
 
-    reg ex_done;
-
-    
     
     // all arithmetic operations are done here including pc
     always @(*) begin
@@ -126,13 +123,10 @@ module ex(input wire rst,
         end
     end
     
-    always @(pc_i) begin
-        ex_done <= 1'b0;
-    end
-
     always @(*) begin
         if (rst == `RstEnable) begin
-            ex_done <= 1'b0;
+            rd_o <= 5'b00000;
+            wreg_o <= 1'b0;
         end else begin
             rd_o   <= rd_i;
             wreg_o <= wreg_i;
@@ -141,6 +135,10 @@ module ex(input wire rst,
     // By the inst alusel_i given, choose one as the final result
     // There will only be logic op here
     always @(*) begin
+        if (rst == `RstEnable) begin 
+            wdata_o <= `ZeroWord;
+            mem_addr_o <= `ZeroWord;
+        end else begin 
             case (alusel_i)
                 `EXE_RES_LOGIC: wdata_o <= logic_out;
                 `EXE_RES_ARITH: wdata_o <= arith_out;
@@ -154,6 +152,7 @@ module ex(input wire rst,
                     wdata_o <= `ZeroWord;
                 end
             endcase
+        end
     end
     
 endmodule
