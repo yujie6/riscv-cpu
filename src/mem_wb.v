@@ -6,6 +6,7 @@ module mem_wb(input wire clk,
               input wire [`RegAddrBus] mem_rd,
               input wire [`RegBus] mem_wdata,
               input wire mem_wreg,
+              input wire wbdone_rst_i,
               input wire [6:0] stall,
               output reg [`RegAddrBus] wb_rd,
               output reg [`RegBus] wb_wdata,
@@ -32,7 +33,8 @@ module mem_wb(input wire clk,
                 OldPc <= wb_pc_i;
         end
 
-        #0.001 if (rst == `RstEnable) begin // Make some delay
+        // #0.001 
+        if (rst == `RstEnable) begin // Make some delay
             wb_rd    <= `NOPRegAddr;
             wb_wdata <= `ZeroWord;
             wb_wreg  <= `WriteDisable;
@@ -44,7 +46,7 @@ module mem_wb(input wire clk,
             wb_rd    <= `NOPRegAddr;
             wb_wdata <= `ZeroWord;
             wb_wreg  <= `WriteDisable;
-            end else if (stall[3] == `NoStop && !wb_done && inst_valid) begin
+            end else if (stall[3] == `NoStop && !(wb_done && !wbdone_rst_i) && inst_valid) begin
             wb_rd    <= mem_rd;
             wb_wdata <= mem_wdata;
             wb_wreg  <= mem_wreg;

@@ -365,6 +365,7 @@ module cpu(input wire clk_in,
     .mem_wdata(mem_wdata_o),
     .stall(stall_sign),
     .wb_pc_i(wb_pc_i),
+    .wbdone_rst_i(memdone_rst),
     // output to wb (regfile)
     .wb_wreg(wb_wreg_i), .wb_wdata(wb_wdata_i),
     .wb_rd(wb_wd_i)
