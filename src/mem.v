@@ -121,18 +121,10 @@ module mem(input wire rst,
     //     end
     // end
     
-<<<<<<< HEAD
-    // always @(pc_i) begin
-    //     mem_done <= 1'b0;
-    //     mem_read_done <= 1'b0;
-    // end
-    reg [`InstAddrBus] OldPC_write, OldPC_read;
-=======
     always @(pc_i) begin
         // mem_done <= 1'b0;
         // mem_read_done <= 1'b0;
     end
->>>>>>> 20baedcbd3fc741cad0add7d1a812dc06f3aa152
     
     reg [`InstAddrBus] OldPC_write, OldPC_read;
     
@@ -148,17 +140,7 @@ module mem(input wire rst,
             OldPC_write <= pc_i;
             mem_we_o <= `WriteDisable;
             mem_addr_write <= `ZeroWord;
-<<<<<<< HEAD
-        end
-        else begin
-            if (pc_i != OldPC_write) begin
-                OldPC_write <= pc_i;
-                mem_done <= 1'b0;
-            end
-        if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b1) begin
-=======
         end else if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b1) begin
->>>>>>> 20baedcbd3fc741cad0add7d1a812dc06f3aa152
             mem_we_o  <= `WriteEnable;
             case (stage_write)
                 5'b00000: begin
@@ -219,34 +201,16 @@ module mem(input wire rst,
             end else begin
             stage_write      <= {5{1'b0}};
             mem_write_byte_o <= `ZeroByte;
-<<<<<<< HEAD
-            if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
-                mem_we_o  <= `WriteDisable;    
-            end
-        end
-=======
             // if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
             //     mem_we_o  <= `WriteDisable;    
             // end
             mem_we_o <= `WriteDisable;
->>>>>>> 20baedcbd3fc741cad0add7d1a812dc06f3aa152
         end 
     end
     
     
     
     always @(posedge clk) begin
-<<<<<<< HEAD
-        if (rst) begin
-            OldPC_read <= pc_i;
-            mem_addr_read <= `ZeroWord;
-        end else begin
-            if (pc_i != OldPC_read) begin
-                OldPC_read <= pc_i;
-                mem_read_done <= 1'b0;
-            end
-        if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
-=======
         if (pc_i != OldPC_read && rst == `RstDisable) begin
                 OldPC_read <= pc_i;
                 mem_read_done <= 1'b0;
@@ -256,7 +220,6 @@ module mem(input wire rst,
             OldPC_read <= pc_i;
             mem_addr_read <= `ZeroWord;
         end else if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0) begin
->>>>>>> 20baedcbd3fc741cad0add7d1a812dc06f3aa152
             // $display("load start", mem_addr_i);
             // load takes 2 cycle
             case (stage_read)
@@ -304,7 +267,6 @@ module mem(input wire rst,
             endcase
             end else begin
             stage_read    <= {5{1'b0}};
-        end
         end
     end
     

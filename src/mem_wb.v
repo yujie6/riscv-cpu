@@ -39,14 +39,7 @@ module mem_wb(input wire clk,
             wb_done  <= 1'b0;
             OldPc <= wb_pc_i;
             end else begin
-<<<<<<< HEAD
-            if (wb_pc_i != OldPc) begin
-                wb_done <= 1'b0;
-                OldPc <= wb_pc_i;
-            end
-=======
             
->>>>>>> 20baedcbd3fc741cad0add7d1a812dc06f3aa152
             if (stall[3] == `Stop && stall[4] == `NoStop) begin
             wb_rd    <= `NOPRegAddr;
             wb_wdata <= `ZeroWord;

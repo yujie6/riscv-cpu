@@ -3,7 +3,7 @@
 
 module InstCache(input wire clk_i,
                  input wire rst_i,
-                 input wire rdy,
+                 input wire rdy_i,
                  input wire we_i,
                  input wire[`InstAddrBus] write_pc_i,
                  input wire[`InstBus] write_inst_i,
@@ -47,7 +47,7 @@ module InstCache(input wire clk_i,
     
     
     always @ (*) begin
-        if (rst_i || !rdy) begin
+        if (rst_i || !rdy_i) begin
             hit_o  <= 1'b0;
             inst_o <= `ZeroWord;
             end else begin

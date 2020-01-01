@@ -163,7 +163,7 @@ module cpu(input wire clk_in,
     );
     
     IF if0(
-    .clk(clk_in), .rst(rst_in),
+    .clk(clk_in), .rst(rst_in), .rdy(rdy_in),
     .pc(pc), .ce(rom_ce_o),
     .mem_addr_o(if_mem_addr),
     .mem_we_o(if_write_enable),
@@ -196,7 +196,8 @@ module cpu(input wire clk_in,
     
     
     if_id if_id0(
-    .clk(clk_in), .rst(rst_in), .if_pc(pc),
+    .clk(clk_in), .rst(rst_in), .rdy(rdy_in), 
+    .if_pc(pc),
     .stall(stall_sign),
     .if_inst(if_inst_o), // supposed to be mem_din (but it's only 1 byte)
     .id_pc(id_pc_i),
@@ -223,7 +224,8 @@ module cpu(input wire clk_in,
     
     
     id id0(
-    .rst(rst_in), .pc_i(id_pc_i), .inst_i(id_inst_i),
+    .rst(rst_in), .pc_i(id_pc_i), .rdy(rdy_in), 
+    .inst_i(id_inst_i),
     // input from regfile
     .reg1_data_i(reg1_data), .reg2_data_i(reg2_data),
     // data send to regfile

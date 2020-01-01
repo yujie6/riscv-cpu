@@ -14,14 +14,13 @@ module riscv_top#(parameter SIM = 0)
     localparam RAM_ADDR_WIDTH = 17;            // 128KiB ram, should not be modified
     
     reg rst;
-    reg rst_delay; // TODO: delay??
+    reg rst_delay; // TODO: Fix rst error
     
     wire clk;
     wire rom_ce;
     wire locked;
     // assign EXCLK (or your own clock module) to clk
     assign clk = EXCLK;
-    // clk_wiz_0 clk_wiz(.reset(btnC), .clk_in1(EXCLK), .clk_out1(clk), .locked(locked));
     
     always @(posedge clk or posedge btnC)
     begin
