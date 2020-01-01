@@ -5,6 +5,7 @@ module mem(input wire rst,
            input wire [`RegBus] wdata_i,
            input wire [`InstAddrBus] pc_i,
            input wire wreg_i,
+           input wire memdone_rst_i,
            input wire [`RegBus] mem_reg2_i,           // data from rs2
            input wire [`MemAddrBus] mem_addr_i,
            input wire [`MemDataBus] mem_read_byte_i,  // data read from memory
@@ -20,7 +21,7 @@ module mem(input wire rst,
            output reg [`MemDataBus] mem_write_byte_o, // this is rs2 send to memory
            output reg [`RegAddrBus] rd_o,
            output reg [`RegBus] wdata_o,              // data send to rd
-           output reg stallreq_mem_o,
+           output wire stallreq_mem_o,
            output reg wreg_o);
     
     assign pc_o = pc_i;
@@ -90,41 +91,64 @@ module mem(input wire rst,
     assign byte_addr_2  = mem_addr_i + 1;
     assign byte_addr_3  = mem_addr_i + 2;
     assign byte_addr_4  = mem_addr_i + 3;
+
+    wire req_mem_write, req_mem_read, req_mem;
+    assign req_mem_write = (mem_done && !memdone_rst_i) ? 1'b0 : alusel_i == `EXE_RES_LOAD_STORE;
+    assign req_mem_read = (mem_read_done && !memdone_rst_i) ? 1'b0 : alusel_i == `EXE_RES_LOAD_STORE;
+    assign req_mem = mem_we_i ? req_mem_write : req_mem_read;
+    assign stallreq_mem_o = rst ? 1'b0 : req_mem;
+
+    // always @ (*) begin
+    //     if (rst) begin
+    //         stallreq_mem_o <= 1'b0;
+    //         end else begin
+    //         stallreq_mem_o <= req_mem;
+    //         // if (mem_we_i) begin
+    //         //     if (mem_done) begin // || mem_read_done
+    //         //         stallreq_mem_o <= 1'b0;
+    //         //     end else begin
+    //         //         stallreq_mem_o <= 
+    //         //         alusel_i == `EXE_RES_LOAD_STORE;
+    //         //     end
+    //         // end else begin
+    //         //     if (mem_read_done) begin
+    //         //         stallreq_mem_o <= 1'b0;
+    //         //     end else begin
+    //         //         stallreq_mem_o <= 
+    //         //         alusel_i == `EXE_RES_LOAD_STORE;
+    //         //     end
+    //         // end
+    //     end
+    // end
     
-    always @ (*) begin
-        if (rst) begin
-            stallreq_mem_o <= 1'b0;
-            end else begin
-            if (mem_we_i) begin
-                if (mem_done) begin // || mem_read_done
-                    stallreq_mem_o <= 1'b0;
-                end else begin
-                    stallreq_mem_o <= 
-                    alusel_i == `EXE_RES_LOAD_STORE;
-                end
-            end else begin
-                if (mem_read_done) begin
-                    stallreq_mem_o <= 1'b0;
-                end else begin
-                    stallreq_mem_o <= 
-                    alusel_i == `EXE_RES_LOAD_STORE;
-                end
-            end
-        end
-    end
-    
+<<<<<<< HEAD
     // always @(pc_i) begin
     //     mem_done <= 1'b0;
     //     mem_read_done <= 1'b0;
     // end
     reg [`InstAddrBus] OldPC_write, OldPC_read;
+=======
+    always @(pc_i) begin
+        // mem_done <= 1'b0;
+        // mem_read_done <= 1'b0;
+    end
+>>>>>>> 20baedcbd3fc741cad0add7d1a812dc06f3aa152
+    
+    reg [`InstAddrBus] OldPC_write, OldPC_read;
     
     // There shall be some kind of delay
     always @(posedge clk) begin
+        // if (pc_i != OldPC_write && rst == `RstDisable) begin
+        //         OldPC_write <= pc_i;
+        //         mem_done <= 1'b0;
+        // end
+        if (memdone_rst_i == 1'b1) mem_done <= 1'b0;
+
         if (rst) begin
             OldPC_write <= pc_i;
             mem_we_o <= `WriteDisable;
             mem_addr_write <= `ZeroWord;
+<<<<<<< HEAD
         end
         else begin
             if (pc_i != OldPC_write) begin
@@ -132,6 +156,9 @@ module mem(input wire rst,
                 mem_done <= 1'b0;
             end
         if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b1) begin
+=======
+        end else if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b1) begin
+>>>>>>> 20baedcbd3fc741cad0add7d1a812dc06f3aa152
             mem_we_o  <= `WriteEnable;
             case (stage_write)
                 5'b00000: begin
@@ -192,16 +219,24 @@ module mem(input wire rst,
             end else begin
             stage_write      <= {5{1'b0}};
             mem_write_byte_o <= `ZeroByte;
+<<<<<<< HEAD
             if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
                 mem_we_o  <= `WriteDisable;    
             end
         end
+=======
+            // if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
+            //     mem_we_o  <= `WriteDisable;    
+            // end
+            mem_we_o <= `WriteDisable;
+>>>>>>> 20baedcbd3fc741cad0add7d1a812dc06f3aa152
         end 
     end
     
     
     
     always @(posedge clk) begin
+<<<<<<< HEAD
         if (rst) begin
             OldPC_read <= pc_i;
             mem_addr_read <= `ZeroWord;
@@ -211,6 +246,17 @@ module mem(input wire rst,
                 mem_read_done <= 1'b0;
             end
         if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
+=======
+        if (pc_i != OldPC_read && rst == `RstDisable) begin
+                OldPC_read <= pc_i;
+                mem_read_done <= 1'b0;
+        end
+        
+        if (rst) begin
+            OldPC_read <= pc_i;
+            mem_addr_read <= `ZeroWord;
+        end else if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0) begin
+>>>>>>> 20baedcbd3fc741cad0add7d1a812dc06f3aa152
             // $display("load start", mem_addr_i);
             // load takes 2 cycle
             case (stage_read)

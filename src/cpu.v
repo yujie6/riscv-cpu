@@ -299,6 +299,8 @@ module cpu(input wire clk_in,
     .alusel_o(ex_alusel_o)
     );
     
+    wire memdone_rst;
+
     ex_mem ex_mem0(
     .rst(rst_in), .clk(clk_in),
     // input from ex
@@ -321,7 +323,8 @@ module cpu(input wire clk_in,
     .mem_rd(mem_wd_i), .mem_addr(mem_addr_i),
     .mem_sel(mem_sel_i), .mem_we(mem_we_i),
     .load_sign(mem_load_sign_i),
-    .mem_aluop(mem_aluop_i), .mem_alusel(mem_alusel_i)
+    .mem_aluop(mem_aluop_i), .mem_alusel(mem_alusel_i),
+    .memdone_rst_o(memdone_rst)
     );
 
     mem mem0(
@@ -332,6 +335,7 @@ module cpu(input wire clk_in,
     .aluop_i(mem_aluop_i),
     .alusel_i(mem_alusel_i),
     .pc_i(mem_pc_i),
+    .memdone_rst_i(memdone_rst),
     .pc_o(wb_pc_i),
     .mem_addr_i(mem_addr_i),
     .mem_reg2_i(mem_reg2_i),
