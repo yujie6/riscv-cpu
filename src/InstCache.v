@@ -14,6 +14,7 @@ module InstCache(input wire clk_i,
     (* ram_style = "registers" *) reg [31:0]    cache_data[`BlockNum - 1:0];
     (* ram_style = "registers" *) reg [9:0]    cache_tag[`BlockNum - 1:0];
     (* ram_style = "registers" *) reg           cache_valid[`BlockNum - 1:0];
+
     wire            rvalid;
     wire [9:0]      read_tag_i;
     wire [6:0]      read_index_i;
@@ -33,12 +34,13 @@ module InstCache(input wire clk_i,
     assign rinst_c = cache_data[read_index_i];
     
     integer i;
+
     always @ (posedge clk_i) begin
         if (rst_i)begin
             for (i = 0; i < `BlockNum; i = i + 1) begin
                 cache_valid[i] <= 1'b0;
             end
-            end else if (we_i) begin // write enable
+        end else if (we_i) begin // write enable
             cache_valid[write_index_i] <= 1'b1;
             cache_tag[write_index_i]   <= write_tag_i;
             cache_data[write_index_i]  <= write_inst_i;

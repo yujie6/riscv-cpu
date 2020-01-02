@@ -7,9 +7,8 @@
 本次大作业主要目的是实现一个基于RISCV架构, rv32ia指令集的CPU。本项目一共实现了以下内容：
 \begin{itemize}
 		\item 取指-译码-执行-访存-回写的五级流水架构
-		\item FPGA 100MHz 测试通过
-		\item 512Byte的指令缓存，可以容纳128条instruction，pi测试点时间为3.9s
-（注：FPGA上测试时需要将Synthesis Settings里面的Fanout Limits改为600）
+		\item FPGA 150MHz 测试通过
+		\item 512Byte的指令缓存，可以容纳128条instruction，pi测试点时间为3s
 \end{itemize}
 
 本项目主要使用verilog硬件设计语言编写，使用iverilog进行模拟，Xilinx Vivado进行仿真综合。

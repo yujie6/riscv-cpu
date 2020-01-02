@@ -1,3 +1,5 @@
+Generating log file
+LD PATH is :/usr/local/lib
 RAM size: 13d8
 13 06 05 00 13 05 00 00 93 f6 15 00 63 84 06 00 
 33 05 c5 00 93 d5 15 00 13 16 16 00 e3 96 05 fe 
@@ -23,5 +25,12 @@ r
 CPU start
 1
 2
+3
+4
+5
+6
+7
+8
+9
 
-CPU returned with running time: 0.005584
+CPU returned with running time: 0.004097
