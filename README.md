@@ -1,14 +1,14 @@
-# RiscV-CPU Hollow
-This project is about writing a CPU from scratch with *RISC-V ISA* (rv32ia). It's written 
+# RISC-V CPU from scratch 
+This project is a [Compueter Architecture](https://acm.sjtu.edu.cn/wiki/System(1)_2019) course project, which is about writing a CPU from scratch with [*RISC-V ISA*](https://riscv.org/) (rv32ia). It's written 
 by **verilog** hardware design language.
 It has features as follows:
 
 * It has five stages pipiline with meomory controller and stall controller.
 * It has 512 bytes instruction cache, which can contain 128 instructions. 
-* It can be simulated correctly for the instructions in rv32i, except ECALL, EBREAK, CSRRW, CSRRS, CSRRC, CSRRWI, CSRRSI, CSRRCI.
+* It can be simulated correctly for the instructions in rv32i, except for ECALL, EBREAK, CSRRW, CSRRS, CSRRC, CSRRWI, CSRRSI, CSRRCI.
 
-* It can generate a CPU on FPGA, simulate a memory on PC, and connect two of them by using uart.
-And could pass all the tests given on board with a frequency of **150M Hz**.
+* It can generate a CPU on FPGA, simulate a memory on PC, and connect two of them by uart.
+And it could pass all the tests given on board with a frequency of **150M Hz**.
 
 ![Summary of on chip power](/doc/power.png)
 
@@ -16,9 +16,7 @@ And could pass all the tests given on board with a frequency of **150M Hz**.
 ### 1.1 Install RISC-V toolchain
 Before we start, it's necessary to install RISC-V toolchain (cross compiler).
 
-Here is a brief introduction about how to install RiscV toolchain 
-for linux or WSL on Windows in 2019.
-Before installation, make sure you have at least *8GB free space*. First clone the official repository: 
+Here is a brief introduction about how to install RiscV toolchain on linux in 2019. First clone the official repository: 
 ```
 git clone https://github.com/riscv/riscv-gnu-toolchain.git && cd riscv-gnu-toolchain
 ```
@@ -33,7 +31,7 @@ sudo make all
 ```
 **Remark**: Here `--with-arch=rv32ia` means we only use the ISA with 32-bit address space, 32 registers and atomic instruction (That's what A-extension means). Using `--with-arch=rv32i` will leads to build error. 
 
-You may wait for about an hour. After that add the following to your `$HOME/.bashrc` or `$HOME/.zshrc` if you are using zsh.
+You may wait for about an hour. After that add the toolchain to PATH.
 ```
 export PATH=$PATH:/opt/riscv/bin
 ```

@@ -19,8 +19,8 @@ module riscv_top#(parameter SIM = 0)
     wire clk;
     wire rom_ce;
     wire locked;
-    //assign clk = EXCLK;
-    clk_wiz_0 new_clk(.reset(btnC), .clk_in1(EXCLK),.clk_out1(clk),.locked(locked));
+    assign clk = EXCLK;
+    //clk_wiz_0 new_clk(.reset(btnC), .clk_in1(EXCLK),.clk_out1(clk),.locked(locked));
     always @(posedge clk or posedge btnC)
     begin
         if (btnC)
