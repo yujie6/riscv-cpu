@@ -12,10 +12,29 @@
 \end{itemize}
 
 本项目主要使用verilog硬件设计语言编写，使用iverilog进行模拟，Xilinx Vivado进行仿真综合。
+(在写完大作业之后我才发现iverilog是一个很好的测试正确性的工具。我还写了一个脚本来进行快速测试正确性。)
 \section{基本架构}
-		在写完大作业之后我才发现iverilog是一个很好测试正确性的工具。
-		我还写了一个脚本来进行快速测试，十分方便。
-\section{实现细节}
+\begin{figure}[htpb]
+		\centering
+		\includegraphics[width=0.8\textwidth]{arch.png}
+		\caption{基本架构}
+		\label{fig:arch-png}
+\end{figure}
+本项目采用的架构为经典的五级流水架构，cpu.v中各模块功能如下
+\begin{enumerate}\setlength{\itemsep}{-0.06cm}
+		\item if: 取指令模块，与MemoryController以及cache交互
+		\item InstCache: 一个512 bytes的指令寄存器，可以做到hit两周期取值
+		\item regfile: 寄存器模块，与wb和id交互
+		\item if\_id: 流水线寄存器，将指令传给id
+		\item id: 指令译码以及判断分支以及跳转与否
+		\item id\_ex: 流水线寄存器，将指令以及译码信息传给ex
+		\item ex: 指令执行，完成所有的计算工作
+		\item ex\_mem: 流水线寄存器，将指令以及内存访问信息传给mem
+		\item mem: 内存访问模块，与MemoryController交互
+		\item mem\_wb: 流水线寄存器，将指令以及寄存器读写信息传给wb
+		\item MemController: 调度取指令和mem阶段的内存访问，与真正的内存交互
+		\item StallController: 控制流水线的暂停，解决hazard
+\end{enumerate}
 \section{遇到的问题}
 在作业过程中，我主要遇到了一下问题
 \begin{itemize}
@@ -27,6 +46,9 @@
 				之后向社区提问之后我才知道是有两个动态链接库缺失了，
 				手动创建软链接之后可以安装。之后Simulate的时候
 				又出现了奇怪的报错，google之后也解决了这个问题。
+		\item 最开始的时候不会取指令，感觉一个周期只能读一个字节实在是
+				太麻烦了，之后看了学长的代码才想到用一个有限状态机来
+				解决这个问题。
 		\item 上板的时候我遇到了许多的critical warning。但是当我
 				解决其中的两个warning之后，我发现自己的正确性又
 				出大问题了，因为我有一个变量memdone必需在两个
@@ -44,8 +66,9 @@
 \begin{itemize}
 		\item riscv-toolchain的安装教程需要更新，
 				因为版本的错误浪费了很多时间在上面。
-		\item 上板的教程和资料不够详细，很多时候错了不知道为什么，
-				问了同学才知道。
+		\item 希望能够提供更多上板的教程和资料，很多时候错了不知道为什么，
+				问了同学才知道。以及Vivado其实有一些很强大的功能，但我也是
+				最后一周才从同学那里了解到的，希望以后能有更多的这方面的资料。
 \end{itemize}
 
 

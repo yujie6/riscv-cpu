@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2019.9.5)  1 JAN 2020 21:35
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2019.9.5)  3 JAN 2020 18:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2109,6 +2109,8 @@ mapping=tex-text;" at 15.05624pt
 Requested font "[FandolSong-Bold.otf]/OT" at 15.05624pt
  -> /home/yujie6/texlive/2019/texmf-dist/fonts/opentype/public/fandol/FandolSon
 g-Bold.otf
+File: arch.png Graphic file (type bmp)
+<arch.png>
  [1
 
 ]
@@ -2118,14 +2120,14 @@ Make it at least 12.64723pt.
 We now make it that large for the rest of the document.
 This may cause the page layout to be inconsistent, however.
 
-[2] (./report.aux) ) 
+[2] [3] (./report.aux) ) 
 Here is how much of TeX's memory you used:
- 46490 strings out of 492909
- 1018817 string characters out of 6132080
- 989494 words of memory out of 5000000
- 49961 multiletter control sequences out of 15000+600000
+ 46476 strings out of 492909
+ 1017171 string characters out of 6132080
+ 992502 words of memory out of 5000000
+ 49944 multiletter control sequences out of 15000+600000
  544435 words of font info for 105 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  60i,11n,99p,853b,429s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on report.pdf (2 pages).
+Output written on report.pdf (3 pages).

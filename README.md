@@ -8,7 +8,9 @@ It has features as follows:
 * It can be simulated correctly for the instructions in rv32i, except ECALL, EBREAK, CSRRW, CSRRS, CSRRC, CSRRWI, CSRRSI, CSRRCI.
 
 * It can generate a CPU on FPGA, simulate a memory on PC, and connect two of them by using uart.
-And could pass all the tests given on board with a frequency of 150M Hz.
+And could pass all the tests given on board with a frequency of **150M Hz**.
+
+![Summary of on chip power](/doc/power.png)
 
 ## 1. Prerequisite
 ### 1.1 Install RISC-V toolchain
@@ -52,12 +54,15 @@ This will compile 'testcase/testname.c' and output some intermediate files to di
 
 ### 1.3 Simulations and Tests
 * Using Vivado: Just move the `.data`  file to the src directory and run simulation. 
-* Using Iverilog: Iverilog is a light weight and open source simulator, which is easy to install with `apt` and fast to simulate. Here I wrote a script `sim.sh` to help me test my CPU, just type 
+* Using Iverilog: Iverilog is a light weight and open source simulator, which is easy to install with `apt` and fast to simulate. Here I wrote a script `sim.sh` to help me test the correctness, just type 
 ```bash
 cd src
 ./sim.sh testname
 ``` 
 ## 2. The Architecture
+
+![Summary of the architecture](/doc/arch.png)
+
 ### 2.1 Five Stages
 The five stages are the same with the classic five stage architecture. And one thing need to 
 be dealt with is control hazard, I use a stall controller to schedule all the stuffs here
@@ -113,14 +118,14 @@ instruction fetch a lot. And the implementation is simple and naive, the core of
 my instruction cache is the following lines:
 ```verilog
 if (!(read_index_i ^ write_index_i) && we_i) begin // read_index_i == write_index_i
-                hit_o  <= 1'b1;
-                inst_o <= write_inst_i;
-                end else if (!(read_tag_i ^ rtag_c) && rvalid) begin
-                hit_o  <= 1'b1;
-                inst_o <= rinst_c;
-                end else begin
-                hit_o  <= 1'b0;
-                inst_o <= `ZeroWord;
+    hit_o  <= 1'b1;
+    inst_o <= write_inst_i;
+end else if (!(read_tag_i ^ rtag_c) && rvalid) begin
+    hit_o  <= 1'b1;
+    inst_o <= rinst_c;
+end else begin
+    hit_o  <= 1'b0;
+    inst_o <= `ZeroWord;
 end
 ```
 

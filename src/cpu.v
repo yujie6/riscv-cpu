@@ -10,9 +10,14 @@ module cpu(input wire clk_in,
            output wire mem_wr,
            output wire rom_ce_o,
            output wire [31:0] dbgreg_dout);
-    // REVIEW: RAM read and write 1 byte per cycle
-    // REVIEW: Thus we need to wait 3 cycles when there is a word write | read
     
+    // FIXME: Feature required begin
+    // NOTE: - support for CS instructions
+    // NOTE: - support for led API
+    // NOTE: - reduce IF & MEM cycles
+    // NOTE: - data cache implementation
+    // NOTE: - beautify code styles and structures
+    // FIXME: Features required end
     
     // implementation goes here
     // Specifications:
