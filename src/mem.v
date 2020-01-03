@@ -28,19 +28,19 @@ module mem(input wire rst,
     reg mem_done;
     reg [`MemAddrBus] mem_addr_write;
     reg [`MemAddrBus] mem_addr_read;
-
+    
     always @(*) begin
         if (rst == `RstEnable) begin
-            rd_o             <= `NOPRegAddr;
-            wdata_o          <= `ZeroWord;
-            wreg_o           <= `WriteDisable;
-            mem_sel_o        <= `MEM_NOP;
+            rd_o       <= `NOPRegAddr;
+            wdata_o    <= `ZeroWord;
+            wreg_o     <= `WriteDisable;
+            mem_sel_o  <= `MEM_NOP;
             mem_addr_o <= `ZeroWord;
             end else begin
-            mem_addr_o <= (mem_we_i == 1'b1) ? mem_addr_write : mem_addr_read; 
-            rd_o     <= rd_i;
-            wreg_o   <= wreg_i;
-            mem_sel_o <= mem_sel_i;
+            mem_addr_o <= (mem_we_i) ? mem_addr_write : mem_addr_read;
+            rd_o       <= rd_i;
+            wreg_o     <= wreg_i;
+            mem_sel_o  <= mem_sel_i;
             if (alusel_i == `EXE_RES_LOAD_STORE && mem_we_i == 1'b0) begin
                 // NOTE: Deal with result of load
                 if (mem_sel_i == `MEM_BYTE) begin
@@ -82,7 +82,7 @@ module mem(input wire rst,
     reg [`MemDataBus] byte_read_2;
     reg [`MemDataBus] byte_read_3;
     reg [`MemDataBus] byte_read_4;
-
+    
     assign byte_write_1 = mem_reg2_i[7:0];
     assign byte_write_2 = mem_reg2_i[15:8];
     assign byte_write_3 = mem_reg2_i[23:16];
@@ -91,87 +91,54 @@ module mem(input wire rst,
     assign byte_addr_2  = mem_addr_i + 1;
     assign byte_addr_3  = mem_addr_i + 2;
     assign byte_addr_4  = mem_addr_i + 3;
-
-    wire req_mem_write, req_mem_read, req_mem;
-    assign req_mem_write = (mem_done && !memdone_rst_i) ? 1'b0 : alusel_i == `EXE_RES_LOAD_STORE;
-    assign req_mem_read = (mem_read_done && !memdone_rst_i) ? 1'b0 : alusel_i == `EXE_RES_LOAD_STORE;
-    assign req_mem = mem_we_i ? req_mem_write : req_mem_read;
-    assign stallreq_mem_o = rst ? 1'b0 : req_mem;
-
-    // always @ (*) begin
-    //     if (rst) begin
-    //         stallreq_mem_o <= 1'b0;
-    //         end else begin
-    //         stallreq_mem_o <= req_mem;
-    //         // if (mem_we_i) begin
-    //         //     if (mem_done) begin // || mem_read_done
-    //         //         stallreq_mem_o <= 1'b0;
-    //         //     end else begin
-    //         //         stallreq_mem_o <= 
-    //         //         alusel_i == `EXE_RES_LOAD_STORE;
-    //         //     end
-    //         // end else begin
-    //         //     if (mem_read_done) begin
-    //         //         stallreq_mem_o <= 1'b0;
-    //         //     end else begin
-    //         //         stallreq_mem_o <= 
-    //         //         alusel_i == `EXE_RES_LOAD_STORE;
-    //         //     end
-    //         // end
-    //     end
-    // end
     
-    always @(pc_i) begin
-        // mem_done <= 1'b0;
-        // mem_read_done <= 1'b0;
-    end
+    wire req_mem_write, req_mem_read, req_mem;
+    assign req_mem_write  = (mem_done && !memdone_rst_i) ? 1'b0 : alusel_i == `EXE_RES_LOAD_STORE;
+    assign req_mem_read   = (mem_read_done && !memdone_rst_i) ? 1'b0 : alusel_i == `EXE_RES_LOAD_STORE;
+    assign req_mem        = mem_we_i ? req_mem_write : req_mem_read;
+    assign stallreq_mem_o = rst ? 1'b0 : req_mem;
+    
     
     reg [`InstAddrBus] OldPC_write, OldPC_read;
     
     // There shall be some kind of delay
     always @(posedge clk) begin
-        // if (pc_i != OldPC_write && rst == `RstDisable) begin
-        //         OldPC_write <= pc_i;
-        //         mem_done <= 1'b0;
-        // end
         if (memdone_rst_i == 1'b1) mem_done <= 1'b0;
-
+        
         if (rst) begin
-            OldPC_write <= pc_i;
-            mem_we_o <= `WriteDisable;
+            OldPC_write    <= pc_i;
+            mem_we_o       <= `WriteDisable;
             mem_addr_write <= `ZeroWord;
-        end else if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b1) begin
-            mem_we_o  <= `WriteEnable;
+            end else if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b1) begin
+            mem_we_o <= `WriteEnable;
             case (stage_write)
                 5'b00000: begin
-                    mem_addr_write      <= byte_addr_1;
+                    mem_addr_write   <= byte_addr_1;
                     mem_write_byte_o <= byte_write_1;
                     stage_write      <= 5'b00001;
-                    //$display("mem store start!");
                 end
                 5'b00001: begin
                     if (mem_sel_o == `MEM_BYTE) begin
                         mem_done    <= 1'b1;
                         stage_write <= 5'b00000;
                         mem_we_o    <= `WriteDisable;
-                        // NOTE: Remember to reset mem_addr_o, or the hci cannot stop
                         mem_addr_write <= `ZeroWord;
                         //$display("mem done");
                     end
                     else begin
-                        mem_addr_write       <= byte_addr_2;
+                        mem_addr_write   <= byte_addr_2;
                         mem_write_byte_o <= byte_write_2;
                         stage_write      <= 5'b00010;
                     end
                 end
                 
                 5'b00010: begin
-                    mem_addr_write       <= byte_addr_3;
+                    mem_addr_write   <= byte_addr_3;
                     mem_write_byte_o <= byte_write_3;
                     if (mem_sel_o == `MEM_HALF) begin
-                        mem_done    <= 1'b1;
-                        stage_write <= 5'b00000;
-                        mem_we_o    <= `WriteDisable;
+                        mem_done       <= 1'b1;
+                        stage_write    <= 5'b00000;
+                        mem_we_o       <= `WriteDisable;
                         mem_addr_write <= `ZeroWord;
                     end
                     else begin
@@ -179,15 +146,15 @@ module mem(input wire rst,
                     end
                 end
                 5'b00011: begin
-                    mem_addr_write       <= byte_addr_4;
+                    mem_addr_write   <= byte_addr_4;
                     mem_write_byte_o <= byte_write_4;
                     stage_write      <= 5'b00100;
                 end
                 5'b00100: begin
                     if (mem_sel_o == `MEM_WORD) begin
-                        mem_done    <= 1'b1;
-                        stage_write <= 5'b00000;
-                        mem_we_o    <= `WriteDisable;
+                        mem_done       <= 1'b1;
+                        stage_write    <= 5'b00000;
+                        mem_we_o       <= `WriteDisable;
                         mem_addr_write <= `ZeroWord;
                     end
                     else begin
@@ -195,45 +162,40 @@ module mem(input wire rst,
                     end
                 end
                 default: begin
-                    
+                    $display("Fatal error");
                 end
             endcase
             end else begin
             stage_write      <= {5{1'b0}};
             mem_write_byte_o <= `ZeroByte;
-            // if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0 && !mem_read_done) begin
-            //     mem_we_o  <= `WriteDisable;    
-            // end
-            mem_we_o <= `WriteDisable;
-        end 
+            mem_we_o         <= `WriteDisable;
+        end
     end
     
     
     
     always @(posedge clk) begin
         if (pc_i != OldPC_read && rst == `RstDisable) begin
-                OldPC_read <= pc_i;
-                mem_read_done <= 1'b0;
+            OldPC_read    <= pc_i;
+            mem_read_done <= 1'b0;
         end
         
         if (rst) begin
-            OldPC_read <= pc_i;
+            OldPC_read    <= pc_i;
             mem_addr_read <= `ZeroWord;
-        end else if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0) begin
-            // $display("load start", mem_addr_i);
-            // load takes 2 cycle
+            end else if (rst == `RstDisable && stallreq_mem_o == 1'b1 && mem_we_i == 1'b0) begin
             case (stage_read)
                 5'b00000: begin
                     mem_addr_read <= byte_addr_1;
-                    stage_read <= 5'b00001;
+                    stage_read    <= 5'b00001;
                 end
                 5'b00001: begin
                     mem_addr_read <= byte_addr_2;
-                    stage_read <= 5'b00010;
+                    stage_read    <= 5'b00010;
                 end
                 5'b00010: begin
-                    mem_addr_read  <= byte_addr_3;
-                    byte_read_1 <= mem_read_byte_i;
+                    mem_addr_read <= byte_addr_3;
+                    byte_read_1   <= mem_read_byte_i;
                     if (mem_sel_o == `MEM_BYTE) begin
                         mem_read_done <= 1'b1;
                         stage_read    <= 5'b00000;
@@ -244,8 +206,8 @@ module mem(input wire rst,
                     end
                 end
                 5'b00011: begin
-                    mem_addr_read  <= byte_addr_4;
-                    byte_read_2 <= mem_read_byte_i;
+                    mem_addr_read <= byte_addr_4;
+                    byte_read_2   <= mem_read_byte_i;
                     if (mem_sel_o == `MEM_HALF) begin
                         mem_read_done <= 1'b1;
                         stage_read    <= 5'b00000;
@@ -263,10 +225,10 @@ module mem(input wire rst,
                     stage_read    <= 5'b00000;
                     mem_addr_read <= `ZeroWord;
                 end
-                default: ;
+                default: $display("Fatal error");
             endcase
             end else begin
-            stage_read    <= {5{1'b0}};
+            stage_read <= {5{1'b0}};
         end
     end
     

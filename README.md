@@ -117,10 +117,10 @@ The instructino cache can boost the speed of
 instruction fetch a lot. And the implementation is simple and naive, the core of
 my instruction cache is the following lines:
 ```verilog
-if (!(read_index_i ^ write_index_i) && we_i) begin // read_index_i == write_index_i
+if ((read_index_i == write_index_i) && we_i) begin 
     hit_o  <= 1'b1;
     inst_o <= write_inst_i;
-end else if (!(read_tag_i ^ rtag_c) && rvalid) begin
+end else if ((read_tag_i == rtag_c) && rvalid) begin
     hit_o  <= 1'b1;
     inst_o <= rinst_c;
 end else begin

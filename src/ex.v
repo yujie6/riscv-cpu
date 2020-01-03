@@ -25,6 +25,7 @@ module ex(input wire rst,
           output wire mem_we_o,
           output wire load_sign_o,
           output wire [`RegBus] reg2_o); 
+
     assign aluop_o = aluop_i;
     assign reg2_o = reg2_i;
     assign pc_o = pc_i;    
@@ -51,7 +52,6 @@ module ex(input wire rst,
                 `EXE_ORI_OP:  logic_out <= $signed(reg1_i) | $signed(imm_i);
                 `EXE_ANDI_OP: logic_out <= $signed(reg1_i) & $signed(imm_i);
                 `EXE_XORI_OP: logic_out <= $signed(reg1_i) ^ $signed(imm_i);
-
                 `EXE_SLT_OP:   logic_out <= $signed(reg1_i) < $signed(reg2_i) ? 1 : 0;
                 `EXE_SLTI_OP:  logic_out <= $signed(reg1_i) < $signed(imm_i) ? 1 : 0;
                 `EXE_SLTU_OP:  logic_out <= reg1_i < reg2_i ? 1 : 0;
@@ -106,13 +106,6 @@ module ex(input wire rst,
             endcase
         end
     end
-
-    // always @(*) begin
-    //     if (rst == `RstEnable || alusel_i != `EXE_RES_JUMP_BRANCH) begin
-    //     end else begin
-    //         // NOTE: perhaps we can do something here....            
-    //     end
-    // end
     
     always @(*) begin
         if (rst == `RstEnable || alusel_i != `EXE_RES_LOAD_STORE) begin

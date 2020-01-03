@@ -32,6 +32,8 @@ module id(input wire rst,
           output reg mem_load_sign_o,
           output reg branch_flag_o,
           output reg wreg_o);
+    
+    
     wire [2:0] funct3      = inst_i[14:12];
     wire [6:0] funct7      = inst_i[31:25];
     wire [6:0] opcode      = inst_i[6:0];
@@ -90,7 +92,7 @@ module id(input wire rst,
             branch_flag_o        <= 1'b0;
             imm_o                <= 32'h0;
             shamt_o              <= 5'b00000;
-            link_addr_o <= `ZeroWord;
+            link_addr_o          <= `ZeroWord;
         end
         
         else begin
@@ -130,27 +132,27 @@ module id(input wire rst,
             `EXE_JAL: begin
                 // jump to imm_j and write pc+4 to rd
                 // FIXME: Continuous 2 jump inst, the second should not be canceled
-                aluop_o                 <= `EXE_JAL_OP;
-                alusel_o                <= `EXE_RES_JUMP_BRANCH;
-                wreg_o                  <= `WriteEnable;
-                imm_o                   <= imm_j;
-                rd_o                    <= rd;
-                link_addr_o             <= pc_4;
+                aluop_o     <= `EXE_JAL_OP;
+                alusel_o    <= `EXE_RES_JUMP_BRANCH;
+                wreg_o      <= `WriteEnable;
+                imm_o       <= imm_j;
+                rd_o        <= rd;
+                link_addr_o <= pc_4;
                 if (branch_cancel_req_i == 1'b0) begin
-                    branch_flag_o           <= 1'b1;
-                    branch_target_addr_o    <= pc_i + imm_j;
+                    branch_flag_o        <= 1'b1;
+                    branch_target_addr_o <= pc_i + imm_j;
                 end
             end
             
             `EXE_JALR: begin
                 // jump to reg[rs1] + imm_i
-                aluop_o  <= `EXE_JALR_OP;
-                alusel_o <= `EXE_RES_JUMP_BRANCH;
-                wreg_o   <= `WriteEnable;
-                imm_o    <= sign_imm_i;
-                rd_o     <= rd;
-                reg1_read_o          <= `ReadEnable;
-                link_addr_o          <= pc_4;
+                aluop_o     <= `EXE_JALR_OP;
+                alusel_o    <= `EXE_RES_JUMP_BRANCH;
+                wreg_o      <= `WriteEnable;
+                imm_o       <= sign_imm_i;
+                rd_o        <= rd;
+                reg1_read_o <= `ReadEnable;
+                link_addr_o <= pc_4;
                 if (branch_cancel_req_i == 1'b0) begin
                     branch_flag_o        <= 1'b1;
                     branch_target_addr_o <= sign_imm_i + reg1_o;
@@ -303,12 +305,12 @@ module id(input wire rst,
                     `EXE_SLTI: begin
                         // imm sign extended & rs1 as signed 32-bit
                         // reg[rd] <= (imm > reg[rs1])
-                        aluop_o <= `EXE_SLTI_OP;
+                        aluop_o  <= `EXE_SLTI_OP;
                         alusel_o <= `EXE_RES_LOGIC;
                     end
                     `EXE_SLTIU: begin
                         // imm sign extended & rs1 as unsigned 32-bit
-                        aluop_o <= `EXE_SLTIU_OP;
+                        aluop_o  <= `EXE_SLTIU_OP;
                         alusel_o <= `EXE_RES_LOGIC;
                         // imm_o <= imm_i;
                         // It's quite strange, we still do sign extension here
@@ -329,29 +331,27 @@ module id(input wire rst,
                         alusel_o <= `EXE_RES_LOGIC;
                     end
                     `EXE_SLLI: begin
-                        // FIXME: Modify alusel here
-                        // reg[rd] <= (reg[rs1] << shamt) also called shit amount
-                        aluop_o <= `EXE_SLLI_OP;
+                        aluop_o  <= `EXE_SLLI_OP;
                         alusel_o <= `EXE_RES_SHIFT;
-                        shamt_o <= rs2;
+                        shamt_o  <= rs2;
                     end
                     `EXE_SRLI_SRAI: begin
                         case (funct7)
                             `EXE_SRLI: begin
-                                aluop_o <= `EXE_SRLI_OP;
+                                aluop_o  <= `EXE_SRLI_OP;
                                 alusel_o <= `EXE_RES_SHIFT;
-                                shamt_o <= rs2;
-                            end 
+                                shamt_o  <= rs2;
+                            end
                             `EXE_SRAI: begin
-                                aluop_o <= `EXE_SRAI_OP;
+                                aluop_o  <= `EXE_SRAI_OP;
                                 alusel_o <= `EXE_RES_SHIFT;
-                                shamt_o <= rs2;
+                                shamt_o  <= rs2;
                             end
                             default: $display("fatal error");
                         endcase
                     end
                     default: begin
-                         $display("fatal error");
+                        $display("fatal error");
                     end
                 endcase
             end
@@ -367,15 +367,13 @@ module id(input wire rst,
                             `EXE_ADD: begin
                                 aluop_o  <= `EXE_ADD_OP;
                                 alusel_o <= `EXE_RES_ARITH;
-                                // $display("Add detected");
                             end
                             `EXE_SUB: begin
                                 aluop_o  <= `EXE_SUB_OP;
                                 alusel_o <= `EXE_RES_ARITH;
-                                // $display("Sub detected");
                             end
                             default: begin
-                                 $display("fatal error");
+                                $display("fatal error");
                             end
                         endcase
                     end
@@ -384,11 +382,11 @@ module id(input wire rst,
                         alusel_o <= `EXE_RES_SHIFT;
                     end
                     `EXE_SLT: begin
-                        aluop_o <= `EXE_SLT_OP;
+                        aluop_o  <= `EXE_SLT_OP;
                         alusel_o <= `EXE_RES_LOGIC;
                     end
                     `EXE_SLTU: begin
-                        aluop_o <= `EXE_SLTU_OP;
+                        aluop_o  <= `EXE_SLTU_OP;
                         alusel_o <= `EXE_RES_LOGIC;
                     end
                     `EXE_XOR: begin
@@ -398,15 +396,15 @@ module id(input wire rst,
                     `EXE_SRL_SRA: begin
                         case (funct7)
                             `EXE_SRL: begin
-                                aluop_o <= `EXE_SRL_OP;
+                                aluop_o  <= `EXE_SRL_OP;
                                 alusel_o <= `EXE_RES_SHIFT;
                             end
                             `EXE_SRA: begin
-                                aluop_o <= `EXE_SRA_OP;
+                                aluop_o  <= `EXE_SRA_OP;
                                 alusel_o <= `EXE_RES_SHIFT;
                             end
                             default: begin
-                                 $display("fatal error");
+                                $display("fatal error");
                             end
                         endcase
                     end
@@ -419,13 +417,13 @@ module id(input wire rst,
                         alusel_o <= `EXE_RES_LOGIC;
                     end
                     default: begin
-                         $display("fatal error");
+                        $display("fatal error");
                     end
                 endcase
             end
             
             default: begin
-                 // $display("fatal error");
+                // $display("fatal error");
             end
         endcase
     end
@@ -436,43 +434,43 @@ module id(input wire rst,
     always @(*) begin
         if (rst == `RstEnable) begin
             reg1_o <= `ZeroWord;
-        end else if (rdy) begin
-        // else if ((reg1_read_o == `ReadEnable) && (ex_wreg_forward == `WriteEnable)
-        //     && (ex_wd_forward == reg1_addr_o)) begin
-        //     // NOTE: Date forwarding from ex
-        //     reg1_o <= ex_wdata_forward;
-        //     end
-        // else if ((reg1_read_o == `ReadEnable) && (mem_wreg_forward == `WriteEnable)
-        //     && (mem_wd_forward == reg1_addr_o))
-        //     begin
-        //     // NOTE: Data forwarding from mem
-        //     reg1_o <= mem_wdata_forward;
-        //     $display("wryyyyyyyyyyyyyyyyyyyyyyyy!!!!!!");
-        //     end
+            end else if (rdy) begin
+            // if ((reg1_read_o == `ReadEnable) && (ex_wreg_forward == `WriteEnable)
+            //     && (ex_wd_forward == reg1_addr_o)) begin
+            //     // NOTE: Date forwarding from ex
+            //     reg1_o <= ex_wdata_forward;
+            //     end
+            // else if ((reg1_read_o == `ReadEnable) && (mem_wreg_forward == `WriteEnable)
+            //     && (mem_wd_forward == reg1_addr_o))
+            //     begin
+            //     // NOTE: Data forwarding from mem
+            //     reg1_o <= mem_wdata_forward;
+            //     $display("wryyyyyyyyyyyyyyyyyyyyyyyy!!!!!!");
+            //     end else 
             if (reg1_read_o == `ReadEnable) begin
-            reg1_o <= reg1_data_i; // read from regfile port 1
-            end else if (reg1_read_o == `ReadDisable) begin
-            reg1_o <= `ZeroWord;
+                reg1_o <= reg1_data_i; // read from regfile port 1
+                end else if (reg1_read_o == `ReadDisable) begin
+                reg1_o <= `ZeroWord;
             end
-        end 
+        end
     end
     
     always @(*) begin
         if (rst == `RstEnable) begin
             reg2_o <= `ZeroWord;
-        end else if (rdy) begin
-            // end else if ((reg2_read_o == `ReadEnable) && (ex_wreg_forward == `WriteEnable)
+            end else if (rdy) begin
+            // if ((reg2_read_o == `ReadEnable) && (ex_wreg_forward == `WriteEnable)
             // && (ex_wd_forward == reg2_addr_o)) begin
             // // NOTE: Date forwarding from ex
             // reg2_o <= ex_wdata_forward;
             // end else if ((reg2_read_o == `ReadEnable) && (mem_wreg_forward == `WriteEnable)
             // && (mem_wd_forward == reg2_addr_o)) begin
             // // NOTE: Data forwarding from mem
-            // reg2_o <= mem_wdata_forward;
+            // reg2_o <= mem_wdata_forward; else
             if (reg2_read_o == `ReadEnable) begin
-            reg2_o <= reg2_data_i; // read from regfile port 2
-            end else begin
-            reg2_o <= `ZeroWord;
+                reg2_o <= reg2_data_i; // read from regfile port 2
+                end else begin
+                reg2_o <= `ZeroWord;
             end
         end
     end

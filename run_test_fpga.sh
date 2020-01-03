@@ -23,6 +23,7 @@ echo "Testing for $1, start now..."
 echo "Generating log file"
 ./ctrl/run.sh ./testdata/bin/$@.bin ./tmp/$@.in /dev/ttyUSB1 -I 
 # cat ./result/$@.log
+rm -rf tmp
 
 #./ctrl/run.sh ./test/test.bin ./test/test.in /dev/ttyUSB1 -T > ./test/test.out
 #if [ -f ./test/test.ans ]; then diff ./test/test.ans ./test/test.out; fi
