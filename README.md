@@ -1,5 +1,5 @@
 # RISC-V CPU from scratch 
-This project is a [Compueter Architecture](https://acm.sjtu.edu.cn/wiki/System(1)_2019) course project, which is about writing a CPU from scratch with [*RISC-V ISA*](https://riscv.org/) (rv32ia). It's written 
+This project is a [Computer Architecture](https://acm.sjtu.edu.cn/wiki/System(1)_2019) course project, which is about writing a CPU from scratch with [*RISC-V ISA*](https://riscv.org/) (rv32ia). It's written 
 by **verilog** hardware design language.
 It has features as follows:
 
